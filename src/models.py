@@ -75,8 +75,8 @@ class ChatMessage(db.Model):
     __tablename__ = 'chat_messages'
 
     chat_message_id = db.Column(db.Integer, primary_key=True)
-    author_id = db.Column(db.Integer, db.ForeignKey(User.user_id), nullable=False)
     chat_id = db.Column(db.Integer, db.ForeignKey(Chat.chat_id), nullable=False)
+    author_id = db.Column(db.Integer, db.ForeignKey(User.user_id))
     creation_time = db.Column(db.DateTime, default=datetime.now)
     message = db.Column(db.String(1024), nullable=False)
     pinned = db.Column(db.Boolean, nullable=False, default=False)
