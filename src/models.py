@@ -1,12 +1,12 @@
 from datetime import datetime
 
 from flask_sqlalchemy import SQLAlchemy
+from flask_login import UserMixin
 
 
 db = SQLAlchemy()
 
 
-class User(db.Model):
 chat_member_table = db.Table(
     'chat_members',
     db.Column('user_id', db.ForeignKey('users.user_id')),
@@ -21,6 +21,7 @@ chat_member_role_table = db.Table(
 )
 
 
+class User(db.Model, UserMixin):
     __tablename__ = 'users'
 
     user_id = db.Column(db.Integer, primary_key=True)
@@ -39,6 +40,10 @@ chat_member_role_table = db.Table(
 
     def __repr__(self) -> str:
         return f"User {self.public_username if self.public_username else ''}(id={self.user_id}, url={self.user_url_token})"
+
+    def get_id(self) -> int:
+        return self.user_id
+
 
 class Chat(db.Model):
     __tablename__ = 'chats'
