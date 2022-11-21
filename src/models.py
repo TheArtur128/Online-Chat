@@ -7,6 +7,20 @@ db = SQLAlchemy()
 
 
 class User(db.Model):
+chat_member_table = db.Table(
+    'chat_members',
+    db.Column('user_id', db.ForeignKey('users.user_id')),
+    db.Column('chat_id', db.ForeignKey('chats.chat_id')),
+)
+
+
+chat_member_role_table = db.Table(
+    'chat_member_roles',
+    db.Column('user_id', db.ForeignKey('users.user_id')),
+    db.Column('chat_roles', db.ForeignKey('chat_roles.chat_role_id')),
+)
+
+
     __tablename__ = 'users'
 
     user_id = db.Column(db.Integer, primary_key=True)
@@ -15,6 +29,9 @@ class User(db.Model):
     public_username = db.Column(db.String(32))
     avatar_path = db.Column(db.String(512))
     description = db.Column(db.String(256))
+
+    chats = db.relationship('Chat', secondary=chat_member_table, back_populates='members')
+    roles = db.relationship('ChatRole', secondary=chat_member_role_table, back_populates='actors')
 
     @property
     def name(self) -> str:
@@ -29,7 +46,9 @@ class Chat(db.Model):
     public_chat_name = db.Column(db.String(32))
     description = db.Column(db.String(256))
 
-    owner = db.relationship("User", foreign_keys=(owner_id, ))
+    members = db.relationship('User', secondary=chat_member_table, back_populates='chats')
+    owner = db.relationship('User', foreign_keys=(owner_id, ))
+
     @property
     def name(self) -> str:
         return self.public_chat_name if self.public_chat_name else self.chat_url_token
@@ -48,7 +67,8 @@ class ChatRole(db.Model):
     message_pinning_rights = db.Column(db.Boolean, nullable=False, default=False)
     styling_rights = db.Column(db.Boolean, nullable=False, default=False)
 
-    chat = db.relationship("Chat", foreign_keys=(chat_id, ))
+    chat = db.relationship('Chat', foreign_keys=(chat_id, ))
+    actors = db.relationship('User', secondary=chat_member_role_table, back_populates='roles')
 
 
 class ChatMessage(db.Model):
@@ -61,5 +81,5 @@ class ChatMessage(db.Model):
     message = db.Column(db.String(1024), nullable=False)
     pinned = db.Column(db.Boolean, nullable=False, default=False)
 
-    author = db.relationship("User", foreign_keys=(author_id, ))
-    chat = db.relationship("Chat", foreign_keys=(chat_id, ))
+    author = db.relationship('User', foreign_keys=(author_id, ))
+    chat = db.relationship('Chat', foreign_keys=(chat_id, ))
