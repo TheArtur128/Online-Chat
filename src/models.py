@@ -10,8 +10,9 @@ class User(db.Model):
     __tablename__ = 'users'
 
     user_id = db.Column(db.Integer, primary_key=True)
-    user_name = db.Column(db.String(64), nullable=False, unique=True)
+    user_url_token = db.Column(db.String(32), nullable=False, unique=True)
     password_hash = db.Column(db.String(1024), nullable=False)
+    public_username = db.Column(db.String(32))
     avatar_path = db.Column(db.String(512))
     description = db.Column(db.String(256))
     status = db.Column(db.String(1))
@@ -22,7 +23,8 @@ class Chat(db.Model):
 
     chat_id = db.Column(db.Integer, primary_key=True)
     owner_id = db.Column(db.Integer, db.ForeignKey(User.user_id), nullable=False)
-    chat_name = db.Column(db.String(64))
+    chat_url_token = db.Column(db.String(32), nullable=False, unique=True)
+    public_chat_name = db.Column(db.String(32))
     description = db.Column(db.String(256))
 
     owner = db.relationship("User", foreign_keys=(owner_id, ))
