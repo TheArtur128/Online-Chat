@@ -16,6 +16,9 @@ class User(db.Model):
     avatar_path = db.Column(db.String(512))
     description = db.Column(db.String(256))
 
+    @property
+    def name(self) -> str:
+        return self.public_username if self.public_username else self.user_url_token
 
 class Chat(db.Model):
     __tablename__ = 'chats'
@@ -27,6 +30,9 @@ class Chat(db.Model):
     description = db.Column(db.String(256))
 
     owner = db.relationship("User", foreign_keys=(owner_id, ))
+    @property
+    def name(self) -> str:
+        return self.public_chat_name if self.public_chat_name else self.chat_url_token
 
 
 class ChatRole(db.Model):
