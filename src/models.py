@@ -37,6 +37,9 @@ chat_member_role_table = db.Table(
     def name(self) -> str:
         return self.public_username if self.public_username else self.user_url_token
 
+    def __repr__(self) -> str:
+        return f"User {self.public_username if self.public_username else ''}(id={self.user_id}, url={self.user_url_token})"
+
 class Chat(db.Model):
     __tablename__ = 'chats'
 
@@ -52,6 +55,9 @@ class Chat(db.Model):
     @property
     def name(self) -> str:
         return self.public_chat_name if self.public_chat_name else self.chat_url_token
+
+    def __repr__(self) -> str:
+        return f"Chat {self.public_chat_name if self.public_chat_name else ''}(id={self.chat_id}, url={self.chat_url_token})"
 
 
 class ChatRole(db.Model):
@@ -70,6 +76,9 @@ class ChatRole(db.Model):
     chat = db.relationship('Chat', foreign_keys=(chat_id, ))
     actors = db.relationship('User', secondary=chat_member_role_table, back_populates='roles')
 
+    def __repr__(self) -> str:
+        return f"ChatRole {self.chat_role_name} of {self.chat.chat_url_token} chat with rights(customization={self.role_customization_rights}, ban={self.user_ban_rights}, message_pinning={self.message_pinning_rights}, styling={self.styling_rights})"
+
 
 class ChatMessage(db.Model):
     __tablename__ = 'chat_messages'
@@ -83,3 +92,6 @@ class ChatMessage(db.Model):
 
     author = db.relationship('User', foreign_keys=(author_id, ))
     chat = db.relationship('Chat', foreign_keys=(chat_id, ))
+
+    def __repr__(self) -> str:
+        return f"Message from user {self.author.user_url_token} in chat {self.chat.chat_url_token}"
