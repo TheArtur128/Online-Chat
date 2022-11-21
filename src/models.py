@@ -15,7 +15,6 @@ class User(db.Model):
     public_username = db.Column(db.String(32))
     avatar_path = db.Column(db.String(512))
     description = db.Column(db.String(256))
-    status = db.Column(db.String(1))
 
 
 class Chat(db.Model):
