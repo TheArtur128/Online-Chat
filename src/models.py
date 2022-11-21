@@ -59,7 +59,7 @@ class ChatRole(db.Model):
 
     chat_role_id = db.Column(db.Integer, primary_key=True)
     chat_id = db.Column(db.Integer, db.ForeignKey(Chat.chat_id))
-    chat_role_name = db.Column(db.String(64), nullable=False)
+    chat_role_name = db.Column(db.String(16), nullable=False)
     description = db.Column(db.String(256))
     hex_rgb_color = db.Column(db.String(6), nullable=False, default='FFFFFF')
     role_customization_rights = db.Column(db.Boolean, nullable=False, default=False)
