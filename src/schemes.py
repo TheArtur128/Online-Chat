@@ -1,7 +1,7 @@
 from marshmallow import Schema, fields, post_load, ValidationError, EXCLUDE
 
 from models import User
-from services.utils import create_length_validator_by_model_column
+from services.utils import create_length_validator_by_model_column, ASCIIRange
 from services.validators import CharactersValidator
 
 
