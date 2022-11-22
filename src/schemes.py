@@ -2,7 +2,7 @@ from marshmallow import Schema, fields, post_load, ValidationError, EXCLUDE
 
 from models import User
 from services.utils import create_length_validator_by_model_column
-from services.validators import ExtraCharactersValidator
+from services.validators import CharactersValidator
 
 
 class BaseUserSchema(Schema):
@@ -13,8 +13,8 @@ class BaseUserSchema(Schema):
         required=True,
         validate=[
             create_length_validator_by_model_column(User, 'user_url_token'),
-            ExtraCharactersValidator(
-                line_name='User url name'
+            CharactersValidator(
+                line_name='User url name',
                 allowable_characters=(
                     *ASCIIRange(48, 58),
                     *ASCIIRange(65, 91),
