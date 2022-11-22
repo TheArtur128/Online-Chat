@@ -30,7 +30,7 @@ class BaseUserSchema(Schema):
     password = fields.String(
         required=True,
         validate=[create_length_validator_by_model_column(User, 'password_hash')],
-        error_messages={"required": "Password is required."}
+        error_messages={'required': "Password is required."}
     )
 
 
