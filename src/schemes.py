@@ -24,7 +24,7 @@ class BaseUserSchema(Schema):
                 )
             )
         ],
-        error_messages={"required": "User url token is required."}
+        error_messages={'required': "User url name is required."}
     )
 
     password = fields.String(
