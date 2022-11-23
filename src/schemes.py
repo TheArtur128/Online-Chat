@@ -1,8 +1,12 @@
-from marshmallow import Schema, fields, post_load, ValidationError, EXCLUDE
+from typing import Callable
+
+from marshmallow import Schema, fields, post_load, ValidationError, EXCLUDE, post_load
+from werkzeug.security import check_password_hash
 
 from models import User
 from services.utils import create_length_validator_by_model_column, ASCIIRange
 from services.validators import CharactersValidator
+from services.errors import UserNotFoundError, AuthenticationError
 
 
 class BaseUserSchema(Schema):
@@ -32,6 +36,23 @@ class BaseUserSchema(Schema):
         validate=[create_length_validator_by_model_column(User, 'password_hash')],
         error_messages={'required': "Password is required."}
     )
+
+    @post_load
+    def load_user(self, data, **headers) -> User:
+        if not 'user_url_token' in self.fields.keys():
+            raise ValidationError("User url name is required.")
+
+        user = User.query.filter_by(**data).first()
+
+        if not user:
+            raise UserNotFoundError("User with such data doesn't exist")
+
+        if 'password' in self.fields.keys():
+            if not 'password' in data:
+                raise ValidationError("Password is required.")
+
+            if not check_password_hash(user.password_hash, data['password']):
+                raise AuthenticationError("Password is incorrect")
 
 
 class FullUserSchema(BaseUserSchema):
