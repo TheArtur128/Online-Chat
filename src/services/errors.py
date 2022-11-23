@@ -11,3 +11,11 @@ class StatusCodeError(SeviceError, ABC):
 
 class AuthenticationError(StatusCodeError):
 	status_code = 401
+
+
+class ResorceSeviceError(SeviceError):
+	pass
+
+
+class UserNotFoundError(ResorceSeviceError, StatusCodeError):
+	status_code = 404
