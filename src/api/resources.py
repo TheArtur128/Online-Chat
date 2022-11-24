@@ -4,7 +4,7 @@ from flask_restful import Resource
 from flask import request, Response
 from marshmallow import Schema
 
-from shemes import BaseUserSchema
+from schemes import BaseUserSchema, FullUserSchema
 
 
 class UserResource(Resource):
