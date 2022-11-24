@@ -39,7 +39,7 @@ class User(db.Model, UserMixin):
         return self.public_username if self.public_username else self.user_url_token
 
     def __repr__(self) -> str:
-        return f"User {self.public_username if self.public_username else ''}(id={self.user_id}, url={self.user_url_token})"
+        return f"User{' ' + self.public_username if self.public_username else ''}(id={self.user_id}, url={self.user_url_token})"
 
     def get_id(self) -> int:
         return self.user_id
@@ -62,7 +62,7 @@ class Chat(db.Model):
         return self.public_chat_name if self.public_chat_name else self.chat_url_token
 
     def __repr__(self) -> str:
-        return f"Chat {self.public_chat_name if self.public_chat_name else ''}(id={self.chat_id}, url={self.chat_url_token})"
+        return f"Chat{' ' + self.public_chat_name if self.public_chat_name else ''}(id={self.chat_id}, url={self.chat_url_token})"
 
 
 class ChatRole(db.Model):
