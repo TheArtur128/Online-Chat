@@ -2,6 +2,10 @@ from abc import ABC, abstractmethod
 from typing import Callable, Optional
 from functools import wraps
 
+from marshmallow import ValidationError
+
+from services.errors import StatusCodeError
+
 
 class Middleware(ABC):
 	def decorate(self, route: Callable) -> Callable:
@@ -14,3 +18,20 @@ class Middleware(ABC):
 	@abstractmethod
 	def call_route(self, route: Callable, *args, **kwargs) -> any:
 		pass
+
+
+class ServiceErrorMiddleware(Middleware):
+	def call_route(self, route: Callable, *args, **kwargs) -> any:
+		try:
+			return route(*args, **kwargs)
+		except StatusCodeError as error:
+			return (
+				(
+					error.messages
+					if isinstance(error, ValidationError)
+					else {'message': str(error)}
+				),
+				error.status_code
+			)
+		except ValidationError as error:
+			return error.messages, 400
