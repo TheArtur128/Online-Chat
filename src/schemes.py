@@ -1,11 +1,12 @@
 from typing import Callable
 
-from marshmallow import Schema, fields, post_load, ValidationError, EXCLUDE, post_load
+from marshmallow import Schema, fields, post_load, ValidationError, EXCLUDE, pre_dump
 from werkzeug.security import check_password_hash
 
 from models import User
 from services.utils import create_length_validator_by_model_column, ASCIIRange
 from services.validators import CharactersValidator
+from services.formatters import format_dict, wrap_in_brackets
 from services.errors import UserNotFoundError, AuthenticationError
 
 
@@ -31,31 +32,45 @@ class BaseUserSchema(Schema):
         error_messages={'required': "User url name is required."}
     )
 
-    password = fields.String(
-        required=True,
-        validate=[create_length_validator_by_model_column(User, 'password_hash')],
-        error_messages={'required': "Password is required."}
+    password_hash = fields.String(
+        validate=[create_length_validator_by_model_column(User, 'password_hash')]
     )
 
+    password = fields.String(dump_only=True)
+
     @post_load
-    def load_user(self, data, **headers) -> User:
+    def load_user(self, data: dict, **kwargs) -> User:
         if not 'user_url_token' in self.fields.keys():
             raise ValidationError("User url name is required.")
 
-        user = User.query.filter_by(**data).first()
+        criteria = data | dict.fromkeys(('password', ))
+        del criteria['password']
 
-        if not user:
-            raise UserNotFoundError("User with such data doesn't exist")
+        user = User.query.filter_by(**criteria).first()
 
-        if 'password' in self.fields.keys():
-            if not 'password' in data:
-                raise ValidationError("Password is required.")
+        if (
+            'password' in self.fields.keys()
+            and 'password' in data.keys()
+            and not check_password_hash(user.password_hash, data['password'])
+        ):
+            raise AuthenticationError("Password is incorrect.")
 
-            if not check_password_hash(user.password_hash, data['password']):
-                raise AuthenticationError("Password is incorrect")
+        return user
 
 
 class FullUserSchema(BaseUserSchema):
-    public_username = fields.String(validate=[create_length_validator_by_model_column(User, 'public_username')])
-    avatar_path = fields.String(validate=[create_length_validator_by_model_column(User, 'avatar_path')])
-    description = fields.String(validate=[create_length_validator_by_model_column(User, 'description')])
+    public_username = fields.String(
+        allow_none=True,
+        dump_default=None,
+        validate=[create_length_validator_by_model_column(User, 'public_username')]
+    )
+    avatar_path = fields.String(
+        allow_none=True,
+        dump_default=None,
+        validate=[create_length_validator_by_model_column(User, 'avatar_path')],
+    )
+    description = fields.String(
+        allow_none=True,
+        dump_default=None,
+        validate=[create_length_validator_by_model_column(User, 'description')]
+    )
