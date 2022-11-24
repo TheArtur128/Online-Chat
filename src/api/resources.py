@@ -13,6 +13,8 @@ class UserResource(Resource):
 	def __init__(self, user_schema: Optional[Schema] = None):
 		self._user_schema = user_schema if user_schema else self._default_user_schema
 		self._user_schema.many = True
+	_user_serialization_schema: Schema = BaseUserSchema(only=('user_url_token', ))
+	_user_deserialization_schema: Schema = FullUserSchema(exclude=('password', ))
 
 	def get(self):
 		try: 
