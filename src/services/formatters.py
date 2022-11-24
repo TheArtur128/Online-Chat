@@ -18,3 +18,13 @@ def format_dict(
 		for key, value in data.items()
 	)
 
+
+def wrap_in_brackets(data: any, bracket: str, times: int = 1) -> str:
+	for _ in range(times):
+		data = (
+			(bracket[0] if len(bracket) > 1 else bracket)
+			+ str(data)
+			+ (bracket[1] if len(bracket) > 1 else bracket)
+		)
+
+	return data
