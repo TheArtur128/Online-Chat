@@ -19,3 +19,7 @@ class ResorceSeviceError(SeviceError):
 
 class UserNotFoundError(ResorceSeviceError, StatusCodeError):
 	status_code = 404
+
+
+class UserDoesntExistError(StatusCodeError):
+	status_code = 404

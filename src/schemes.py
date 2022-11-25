@@ -7,7 +7,7 @@ from models import User
 from services.utils import create_length_validator_by_model_column, ASCIIRange
 from services.validators import CharactersValidator
 from services.formatters import format_dict, wrap_in_brackets
-from services.errors import UserNotFoundError, AuthenticationError
+from services.errors import UserNotFoundError, AuthenticationError, UserDoesntExistError
 
 
 class BaseUserSchema(Schema):
@@ -47,6 +47,17 @@ class BaseUserSchema(Schema):
         del criteria['password']
 
         user = User.query.filter_by(**criteria).first()
+        
+        if not user:
+            raise UserDoesntExistError(
+                "User with data ({user_data}) does not exist".format(
+                    user_data=format_dict(
+                        data,
+                        line_between_key_and_value='=',
+                        value_changer=lambda value: f'"{value}"'
+                    )
+                )
+            )
 
         if (
             'password' in self.fields.keys()
