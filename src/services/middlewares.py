@@ -35,3 +35,8 @@ class ServiceErrorMiddleware(Middleware):
 			)
 		except ValidationError as error:
 			return error.messages, 400
+
+
+class DBMiddleware(Middleware, ABC):
+	def __init__(self, database: SQLAlchemy):
+		self.database = database
