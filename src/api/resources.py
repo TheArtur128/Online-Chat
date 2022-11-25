@@ -9,12 +9,11 @@ from schemes import FullUserSchema
 
 
 class UserResource(Resource):
-	user_serialization_schema: Schema = FullUserSchema(exclude=('password', 'password_hash'))
-	user_deserialization_schema: Schema = FullUserSchema(exclude=('password', 'password_hash'))
+	user_schema: Schema = FullUserSchema(exclude=('password', 'password_hash'))
 
 	@ServiceErrorMiddleware().decorate
 	def get(self):
-		return self.user_deserialization_schema.dump(
-			self.user_serialization_schema.load(request.json, many=True),
+		return self.user_schema.dump(
+			self.user_schema.load(request.json, many=True),
 			many=True
 		)
