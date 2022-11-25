@@ -4,13 +4,13 @@ from flask_restful import Resource
 from flask import request, Response
 from marshmallow import Schema
 
-from schemes import BaseUserSchema, FullUserSchema
 from services.middlewares import ServiceErrorMiddleware
+from schemes import FullUserSchema
 
 
 class UserResource(Resource):
-	user_serialization_schema: Schema = BaseUserSchema(only=('user_url_token', ))
-	user_deserialization_schema: Schema = FullUserSchema(exclude=('password', ))
+	user_serialization_schema: Schema = FullUserSchema(exclude=('password', 'password_hash'))
+	user_deserialization_schema: Schema = FullUserSchema(exclude=('password', 'password_hash'))
 
 	@ServiceErrorMiddleware().decorate
 	def get(self):
