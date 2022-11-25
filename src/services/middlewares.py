@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Callable, Optional
 from functools import wraps
 
+from flask_sqlalchemy import SQLAlchemy
 from marshmallow import ValidationError
 
 from services.errors import StatusCodeError
@@ -40,3 +41,17 @@ class ServiceErrorMiddleware(Middleware):
 class DBMiddleware(Middleware, ABC):
 	def __init__(self, database: SQLAlchemy):
 		self.database = database
+
+
+class DBSessionFinisherMiddleware(DBMiddleware):
+	def call_route(self, route: Callable, *args, **kwargs) -> any:
+		try:
+			result = route(*args, **kwargs)
+			self.database.session.commit()
+
+			return result
+
+		except Exception as error:
+			self.database.session.rollback()
+
+			raise error
