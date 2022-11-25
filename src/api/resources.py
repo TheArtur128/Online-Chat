@@ -1,7 +1,7 @@
-from typing import Optional, Callable
+from typing import Callable
 
 from flask_restful import Resource
-from flask import request, Response
+from flask import request
 from marshmallow import Schema
 
 from services.middlewares import ServiceErrorMiddleware
