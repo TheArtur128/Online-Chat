@@ -52,7 +52,7 @@ class User(db.Model, _FormattedUrlModelMixin):
     id = db.Column(db.Integer, primary_key=True)
     url_token = db.Column(db.String(32), nullable=False, unique=True)
     password_hash = db.Column(db.String(1024), nullable=False)
-    public_username = db.Column(db.String(32))
+    name = db.Column(db.String(64), nullable=False)
     avatar_path = db.Column(db.String(512))
     description = db.Column(db.String(256))
 
