@@ -14,12 +14,12 @@ class BaseUserSchema(Schema):
     class Meta:
         unknown = EXCLUDE
 
-    user_url_token = fields.String(
+    url_token = fields.String(
         required=True,
         validate=[
-            create_length_validator_by_model_column(User, 'user_url_token'),
+            create_length_validator_by_model_column(User, 'url_token'),
             CharactersValidator(
-                line_name='User url name',
+                line_name='Url token',
                 allowable_characters=(
                     *ASCIIRange(48, 58),
                     *ASCIIRange(65, 91),
@@ -29,7 +29,7 @@ class BaseUserSchema(Schema):
                 )
             )
         ],
-        error_messages={'required': "User url name is required."}
+        error_messages={'required': "Url token is required."}
     )
 
     password_hash = fields.String(
@@ -40,8 +40,8 @@ class BaseUserSchema(Schema):
 
     @post_load
     def load_user(self, data: dict, **kwargs) -> User:
-        if not 'user_url_token' in self.fields.keys():
-            raise ValidationError("User url name is required.")
+        if not 'url_token' in self.fields.keys():
+            raise ValidationError("Url token is required.")
 
         criteria = data | dict.fromkeys(('password', ))
         del criteria['password']
@@ -70,10 +70,8 @@ class BaseUserSchema(Schema):
 
 
 class FullUserSchema(BaseUserSchema):
-    public_username = fields.String(
-        allow_none=True,
-        dump_default=None,
-        validate=[create_length_validator_by_model_column(User, 'public_username')]
+    name = fields.String(
+        validate=[create_length_validator_by_model_column(User, 'name')]
     )
     avatar_path = fields.String(
         allow_none=True,

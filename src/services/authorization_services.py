@@ -35,9 +35,9 @@ class DBUserRegistrar(IUserRegistrar):
 	def _register_user(self, user_data: dict) -> None:
 		user_data = self._prepare_user_data(user_data)
 
-		if User.query.filter_by(user_url_token=user_data['user_url_token']).first():
+		if User.query.filter_by(url_token=user_data['url_token']).first():
 			raise UserAlreadyExistsError(
-				f"User with \"{user_data['user_url_token']}\" url token already exists"
+				f"User with \"{user_data['url_token']}\" url token already exists"
 			)
 
 		self.database.session.add(User(**user_data))
