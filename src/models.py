@@ -63,7 +63,7 @@ class User(db.Model, _FormattedUrlModelMixin):
 
 
 
-class Chat(db.Model):
+class Chat(db.Model, _FormattedUrlModelMixin):
     __tablename__ = 'chats'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -74,13 +74,6 @@ class Chat(db.Model):
 
     members = db.relationship('User', secondary=chat_member_table, back_populates='chats')
     owner = db.relationship('User', foreign_keys=(owner_id, ))
-
-    @property
-    def name(self) -> str:
-        return self.public_chat_name if self.public_chat_name else self.chat_url_token
-
-    def __repr__(self) -> str:
-        return f"Chat{' ' + self.public_chat_name if self.public_chat_name else ''}(id={self.chat_id}, url={self.chat_url_token})"
 
 
 class ChatRole(db.Model):
