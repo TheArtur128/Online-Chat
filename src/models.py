@@ -46,6 +46,18 @@ class _FormattedUrlModelMixin:
         return str(getattr(self, self._url_attribute))
 
 
+class Token(db.Model):
+    __tablename__ ='tokens'
+
+    id = db.Column(db.Integer, primary_key=True)
+    body = db.Column(db.String(256), nullable=False)
+    cancellation_time = db.Column(db.DateTime, nullable=False)
+
+    @property
+    def is_valid(self) -> bool:
+        return datetime.now() < self.cancellation_time
+
+
 class User(db.Model, _FormattedUrlModelMixin):
     __tablename__ = 'users'
 
