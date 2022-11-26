@@ -22,6 +22,30 @@ chat_member_role_table = db.Table(
 
 
 class User(db.Model, UserMixin):
+class _FormattedUrlModelMixin:
+    _id_attribute: str = 'id'
+    _name_attribute: str = 'name'
+    _url_attribute: str = 'url_token'
+
+    def __repr__(self) -> str:
+        return "{class_name}{name_part}(id={id}, url={url})".format(
+            class_name= self.__class__.__name__,
+            name_part=' ' + self.__name if self.__name else '',
+            id=self.__id,
+            url=self.__url
+        )
+
+    @property
+    def __id(self) -> str:
+        return str(getattr(self, self._id_attribute))
+
+    @property
+    def __name(self) -> str:
+        return str(getattr(self, self._name_attribute))
+
+    @property
+    def __url(self) -> str:
+        return str(getattr(self, self._url_attribute))
     __tablename__ = 'users'
 
     user_id = db.Column(db.Integer, primary_key=True)
