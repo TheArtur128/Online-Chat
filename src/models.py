@@ -8,15 +8,15 @@ db = SQLAlchemy()
 
 chat_member_table = db.Table(
     'chat_members',
-    db.Column('user_id', db.ForeignKey('users.user_id')),
-    db.Column('chat_id', db.ForeignKey('chats.chat_id')),
+    db.Column('user_id', db.ForeignKey('users.id')),
+    db.Column('chat_id', db.ForeignKey('chats.id')),
 )
 
 
 chat_member_role_table = db.Table(
     'chat_member_roles',
-    db.Column('user_id', db.ForeignKey('users.user_id')),
-    db.Column('chat_roles', db.ForeignKey('chat_roles.chat_role_id')),
+    db.Column('user_id', db.ForeignKey('users.id')),
+    db.Column('chat_role_id', db.ForeignKey('chat_roles.id')),
 )
 
 
@@ -126,4 +126,4 @@ class ChatMessage(db.Model):
     chat = db.relationship('Chat', foreign_keys=(chat_id, ))
 
     def __repr__(self) -> str:
-        return f"Message from user {self.author.user_url_token} in chat {self.chat.chat_url_token}"
+        return f"Message from user {self.author.url_token} in chat {self.chat.url_token}"
