@@ -1,7 +1,6 @@
 from datetime import datetime
 
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import UserMixin
 
 
 db = SQLAlchemy()
@@ -21,7 +20,6 @@ chat_member_role_table = db.Table(
 )
 
 
-class User(db.Model, UserMixin):
 class _FormattedUrlModelMixin:
     _id_attribute: str = 'id'
     _name_attribute: str = 'name'
@@ -46,6 +44,9 @@ class _FormattedUrlModelMixin:
     @property
     def __url(self) -> str:
         return str(getattr(self, self._url_attribute))
+
+
+class User(db.Model, _FormattedUrlModelMixin):
     __tablename__ = 'users'
 
     user_id = db.Column(db.Integer, primary_key=True)
