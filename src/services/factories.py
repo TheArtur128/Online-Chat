@@ -52,3 +52,22 @@ class CustomArgumentFactory(ArgumentFactory):
     @is_input_arguments_first.setter
     def is_input_arguments_first(self, is_input_arguments_first: bool) -> None:
         self._is_input_arguments_first = is_input_arguments_first
+
+
+class TokenFactory(ABC):
+    _original_token_factory: Callable[[str, datetime], Token] = Token
+
+    def __call__(self) -> Token:
+        return self._original_token_factory(
+            body=self._create_token_body(),
+            cancellation_time=self._get_token_cancellation_time()
+        )
+
+    @abstractmethod
+    def _create_token_body(self) -> str:
+        pass
+
+    @abstractmethod
+    def _get_token_cancellation_time(self) -> datetime:
+        pass
+
