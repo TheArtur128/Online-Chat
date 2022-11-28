@@ -1,5 +1,8 @@
 from abc import ABC, abstractmethod
+from datetime import datetime
 from typing import Callable, Iterable
+
+from models import Token
 
 
 class ArgumentFactory(ABC):
@@ -79,3 +82,21 @@ class MinuteTokenFactory(TokenFactory, ABC):
         return datetime.fromtimestamp(
             datetime.now().timestamp() + self._token_life_minutes*60
         )
+
+
+class CustomMinuteTokenFactory(MinuteTokenFactory):
+    def __init__(self, token_life_minutes: int | float, token_body_factory: Callable[[], str]):
+        self.token_life_minutes = token_life_minutes
+        self.token_body_factory = token_body_factory
+
+    @property
+    def token_life_minutes(self) -> int | float:
+        return self._token_life_minutes
+
+    @token_life_minutes.setter
+    def token_life_minutes(self, minutes: int | float) -> None:
+        self._token_life_minutes = minutes
+
+    def _create_token_body(self) -> str:
+        return self.token_body_factory()
+
