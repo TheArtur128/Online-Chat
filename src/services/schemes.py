@@ -33,10 +33,11 @@ class BaseUserSchema(Schema):
     )
 
     password_hash = fields.String(
+        required=True,
         validate=[create_length_validator_by_model_column(User, 'password_hash')]
     )
 
-    password = fields.String(dump_only=True)
+    password = fields.String(required=True, dump_only=True)
 
 
 class FullUserSchema(BaseUserSchema):
