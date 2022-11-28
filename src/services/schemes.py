@@ -38,36 +38,6 @@ class BaseUserSchema(Schema):
 
     password = fields.String(dump_only=True)
 
-    @post_load
-    def load_user(self, data: dict, **kwargs) -> User:
-        if not 'url_token' in self.fields.keys():
-            raise ValidationError("Url token is required.")
-
-        criteria = data | dict.fromkeys(('password', ))
-        del criteria['password']
-
-        user = User.query.filter_by(**criteria).first()
-        
-        if not user:
-            raise UserDoesntExistError(
-                "User with data ({user_data}) does not exist".format(
-                    user_data=format_dict(
-                        data,
-                        line_between_key_and_value='=',
-                        value_changer=lambda value: f'"{value}"'
-                    )
-                )
-            )
-
-        if (
-            'password' in self.fields.keys()
-            and 'password' in data.keys()
-            and not check_password_hash(user.password_hash, data['password'])
-        ):
-            raise AuthenticationError("Password is incorrect.")
-
-        return user
-
 
 class FullUserSchema(BaseUserSchema):
     name = fields.String(
