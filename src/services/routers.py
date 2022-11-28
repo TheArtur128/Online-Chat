@@ -2,7 +2,9 @@ from abc import ABC, abstractmethod
 
 from marshmallow import Schema, ValidationError
 
+from models import db, User, Token
 from services.middlewares import MiddlewareKeeper, DBSessionFinisherMiddleware
+from services.schemes import FullUserSchema
 
 
 class IRouter(ABC):
@@ -39,3 +41,23 @@ class SchemaRouter(Router, ABC):
             raise ValidationError(errors)
 
         return self._schema.dump(data)
+
+
+class UserDataGetterRouter(SchemaRouter):
+    _schema = FullUserSchema(many=False, exclude=('password', 'password_hash'))
+
+    def _handle_cleaned_data(self, data: dict) -> dict:
+        user = User.query.filter_by(**data).first()
+        
+        if not user:
+            raise UserDoesntExistError(
+                "User with data ({data}) does not exist".format(
+                    user_data=format_dict(
+                        data,
+                        line_between_key_and_value='=',
+                        value_changer=lambda value: f'"{value}"'
+                    )
+                )
+            )
+
+        return self._schema.dump(user)
