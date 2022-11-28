@@ -71,3 +71,11 @@ class TokenFactory(ABC):
     def _get_token_cancellation_time(self) -> datetime:
         pass
 
+
+class MinuteTokenFactory(TokenFactory, ABC):
+    _token_life_minutes: int | float
+
+    def _get_token_cancellation_time(self) -> datetime:
+        return datetime.fromtimestamp(
+            datetime.now().timestamp() + self._token_life_minutes*60
+        )
