@@ -104,7 +104,7 @@ class ChatRole(db.Model):
     actors = db.relationship('User', secondary=chat_member_role_table, back_populates='roles')
 
     def __repr__(self) -> str:
-        return f"ChatRole {self.name} of {self.chat.url_token} chat with rights(customization={self.role_customization_rights}, ban={self.user_ban_rights}, message_pinning={self.message_pinning_rights}, styling={self.styling_rights})"
+        return f"ChatRole {self.name} of {self.chat.url_token} chat with rights(customization={self.role_customization_rights}, ban={self.user_ban_rights})"
 
 
 class ChatMessage(db.Model):
