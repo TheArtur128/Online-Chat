@@ -50,7 +50,7 @@ class Token(db.Model):
     __tablename__ ='tokens'
 
     id = db.Column(db.Integer, primary_key=True)
-    body = db.Column(db.String(256), nullable=False)
+    body = db.Column(db.String(512), nullable=False)
     cancellation_time = db.Column(db.DateTime, nullable=False)
 
     @property
