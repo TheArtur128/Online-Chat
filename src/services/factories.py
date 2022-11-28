@@ -20,3 +20,35 @@ class ArgumentFactory(ABC):
             **self._kwargs,
             **kwargs
         )
+
+
+class CustomArgumentFactory(ArgumentFactory):
+    def __init__(self, original_factory: Callable, *args, is_input_arguments_first: bool = True, **kwargs):
+        self._original_factory = original_factory
+        self.args = args
+        self.kwargs = kwargs
+        self._is_input_arguments_first = is_input_arguments_first
+
+    @property
+    def args(self) -> tuple:
+        return self._args
+
+    @args.setter
+    def args(self, args: Iterable) -> None:
+        self._args = tuple(args)
+
+    @property
+    def kwargs(self) -> dict:
+        return self._kwargs
+
+    @kwargs.setter
+    def kwargs(self, kwargs: dict) -> None:
+        self._kwargs = dict(kwargs)
+
+    @property
+    def is_input_arguments_first(self) -> bool:
+        return self._is_input_arguments_first
+
+    @is_input_arguments_first.setter
+    def is_input_arguments_first(self, is_input_arguments_first: bool) -> None:
+        self._is_input_arguments_first = is_input_arguments_first
