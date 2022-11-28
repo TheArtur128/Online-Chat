@@ -1,10 +1,11 @@
 from abc import ABC, abstractmethod
-from typing import Callable, Optional
+from typing import Callable, Optional, Iterable
 from functools import wraps
 
 from flask_sqlalchemy import SQLAlchemy
 from marshmallow import ValidationError
 
+from services.factories import CustomArgumentFactory
 from services.errors import StatusCodeError
 
 
@@ -19,6 +20,19 @@ class Middleware(ABC):
 	@abstractmethod
 	def call_route(self, route: Callable, *args, **kwargs) -> any:
 		pass
+
+
+class ProxyMiddleware(Middleware):
+	def __init__(self, middlewares: Iterable[Middleware]):
+		self.middlewares = list(middlewares)
+
+	def call_route(self, route: Callable, *args, **kwargs) -> any:
+		call_layer = route
+
+		for middleware in self.middlewares:
+			call_layer = CustomArgumentFactory(middleware.call_route, call_layer)
+
+		call_layer(*args, **kwargs)
 
 
 class ServiceErrorMiddleware(Middleware):
