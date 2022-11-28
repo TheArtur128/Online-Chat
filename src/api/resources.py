@@ -2,23 +2,20 @@ from typing import Callable
 
 from flask_restful import Resource
 from flask import request
-from marshmallow import Schema
 
-from models import db
-from schemes import FullUserSchema
 from services.middlewares import ServiceErrorMiddleware
-from services.authorization_services import DBUserRegistrar
+from services.routers import UserDataGetterRouter, UserRegistrarRouter
 
 
 class UserResource(Resource):
-	user_schema: Schema = FullUserSchema(exclude=('password', 'password_hash'))
-	user_registrar: Callable[[dict], any] = DBUserRegistrar(db)
+	user_data_getter: Callable[[dict], dict] = UserDataGetterRouter()
+	user_registrar: Callable[[dict], any] = UserRegistrarRouter()
 
 	@ServiceErrorMiddleware().decorate
 	def get(self):
-		return self.user_schema.dump(
-			self.user_schema.load(request.json, many=True),
-			many=True
+		return (
+			self.user_data_getter(user_data)
+			for user_data in request.json
 		)
 
 	@ServiceErrorMiddleware().decorate
