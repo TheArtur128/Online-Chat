@@ -1,8 +1,12 @@
 from abc import ABC, abstractmethod
+from typing import Callable
+from secrets import token_hex
 
 from marshmallow import Schema, ValidationError
+from flask_sqlalchemy import SQLAlchemy
 
 from models import db, User, Token
+from services.factories import CustomMinuteTokenFactory, CustomArgumentFactory
 from services.middlewares import MiddlewareKeeper, DBSessionFinisherMiddleware
 from services.schemes import FullUserSchema
 
@@ -61,3 +65,45 @@ class UserDataGetterRouter(SchemaRouter):
             )
 
         return self._schema.dump(user)
+
+
+class UserRegistrarRouter(MiddlewareRouter):
+    _middleware_attribute_names = (*MiddlewareRouter._middleware_attribute_names, '_db_session_middleware')
+
+    _db_session_middleware = DBSessionFinisherMiddleware(db)
+    _schema = FullUserSchema(many=False, exclude=('password_hash', ))
+
+    __user_refresh_token_factory: Callable[[], Token] = CustomMinuteTokenFactory(
+        60*24*30,
+        CustomArgumentFactory(token_hex, Token.body.comparator.type.length // 2)
+    )
+
+    @property
+    def database(self) -> SQLAlchemy:
+        return self._db_session_middleware.database
+
+    @database.setter
+    def database(self, database: SQLAlchemy) -> None:
+        self._db_session_middleware.database = database
+
+    def _get_cleaned_data_from(self, data: dict) -> dict:
+        data = super()._get_cleaned_data_from(data)
+
+        data['password_hash'] = generate_password_hash(data['password'])
+        del data['password']
+
+        return data
+
+    def _handle_cleaned_data(self, data: dict) -> None:
+        if User.query.filter_by(url_token=data['url_token']).first():
+            raise UserAlreadyExistsError(
+                f"User with \"{data['url_token']}\" url token already exists"
+            )
+
+        user_refresh_token = self.__user_token_factory()
+        user = User(refresh_token=user_refresh_token, **data)
+
+        self.database.session.add(user_refresh_token)
+        self.database.session.add(user)
+
+        return user_refresh_token
