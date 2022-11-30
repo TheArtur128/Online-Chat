@@ -94,7 +94,7 @@ class UserRegistrarRouter(MiddlewareRouter):
 
         return data
 
-    def _handle_cleaned_data(self, data: dict) -> None:
+    def _handle_cleaned_data(self, data: dict) -> str:
         if User.query.filter_by(url_token=data['url_token']).first():
             raise UserAlreadyExistsError(
                 f"User with \"{data['url_token']}\" url token already exists"
@@ -106,4 +106,4 @@ class UserRegistrarRouter(MiddlewareRouter):
         self.database.session.add(user_refresh_token)
         self.database.session.add(user)
 
-        return user_refresh_token
+        return user_refresh_token.body
