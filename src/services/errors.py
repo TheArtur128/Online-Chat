@@ -2,28 +2,28 @@ from abc import ABC
 
 
 class SeviceError(Exception):
-	pass
+    pass
 
 
 class StatusCodeError(SeviceError, ABC):
-	status_code: int
+    status_code: int
 
 
 class AuthenticationError(StatusCodeError):
-	status_code = 401
+    status_code = 401
 
 
 class ResorceSeviceError(SeviceError):
-	pass
+    pass
 
 
 class UserNotFoundError(ResorceSeviceError, StatusCodeError):
-	status_code = 404
+    status_code = 404
 
 
 class UserAlreadyExistsError(StatusCodeError):
-	status_code = 409
+    status_code = 409
 
 
 class UserDoesntExistError(StatusCodeError):
-	status_code = 404
+    status_code = 404
