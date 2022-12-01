@@ -6,15 +6,10 @@ from marshmallow import Schema, ValidationError
 from flask_sqlalchemy import SQLAlchemy
 
 from models import db, User, Token
+from services.abstractions.interfaces import IRouter
 from services.factories import CustomMinuteTokenFactory, CustomArgumentFactory
 from services.middlewares import MiddlewareKeeper, DBSessionFinisherMiddleware
 from services.schemes import FullUserSchema
-
-
-class IRouter(ABC):
-    @abstractmethod
-    def __call__(self, data: dict) -> any:
-        pass
 
 
 class Router(IRouter, ABC):
