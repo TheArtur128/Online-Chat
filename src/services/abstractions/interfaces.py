@@ -18,3 +18,7 @@ class IJWTDecoder(ABC):
     @abstractmethod
     def decode(self, token: str) -> dict:
         pass
+
+
+class IJWTSerializator(IJWTCoder, IJWTDecoder, ABC):
+    pass
