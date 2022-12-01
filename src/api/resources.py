@@ -25,3 +25,12 @@ class RoutResource(MiddlewareKeeper, Resource):
             )
 
         super(Resource, self).__init__()
+
+
+class UserResource(RoutResource):
+    get = UserDataGetterRouter()
+    post = UserRegistrarRouter(
+        db,
+        DEFAULT_REFRESH_TOKEN_FACTORY,
+        DEFAULT_ACCESS_TOKEN_FACTORY
+    )
