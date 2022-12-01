@@ -1,10 +1,13 @@
 from abc import ABC, abstractmethod
 from datetime import datetime
 from typing import Callable, Iterable
+from secrets import token_hex
 
-from models import Token
+from config import SECRET_KEY, ACCESS_TOKEN_LIFE_MINUTES, REFRESH_TOKEN_LIFE_DAYS
+from models import Token, User
 from services.abstractions.interfaces import IJWTCoder
 from services.utils import get_time_after
+from services.jwt_serializers import JWTSerializator
 
 
 class ArgumentFactory(ABC):
@@ -113,3 +116,16 @@ class UserAccessTokenFactory:
             'url_token': user.url_token,
             'exp': get_time_after(self.life_minutes, is_time_raw=True)
         })
+
+
+DEFAULT_JWT_SERIALIZATOR_FACORY = CustomArgumentFactory(JWTSerializator, SECRET_KEY)
+
+DEFAULT_ACCESS_TOKEN_FACTORY = UserAccessTokenFactory(
+    DEFAULT_JWT_SERIALIZATOR_FACORY,
+    ACCESS_TOKEN_LIFE_MINUTES
+)
+
+DEFAULT_REFRESH_TOKEN_FACTORY = CustomMinuteTokenFactory(
+    REFRESH_TOKEN_LIFE_DAYS*24*60,
+    CustomArgumentFactory(token_hex, Token.body.comparator.type.length // 2)
+)
