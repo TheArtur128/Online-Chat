@@ -12,7 +12,7 @@ from services.middlewares import MiddlewareKeeper, DBSessionFinisherMiddleware
 from services.schemes import FullUserSchema
 
 
-class Router(IRouter, ABC):
+class Router(ABC):
     def __call__(self, data: dict) -> any:
         return self._handle_cleaned_data(self._get_cleaned_data_from(data))
 
