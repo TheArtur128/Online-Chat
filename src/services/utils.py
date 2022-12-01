@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from datetime import datetime
 
 from marshmallow.validate import Length
 
@@ -23,3 +24,9 @@ class ASCIIRange:
         return iter(
             (chr(symbol_index) for symbol_index in range(self.start, self.end, self.step))
         )
+
+
+def get_time_after(minutes: int, is_time_raw: bool = False) -> datetime | float:
+    timestamp = datetime.today().timestamp() + minutes*60
+
+    return seconds_since_epoch if is_time_raw else datetime.fromtimestamp(timestamp)
