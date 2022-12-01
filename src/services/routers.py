@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Callable
+from typing import Callable, Iterable, NamedTuple
 from secrets import token_hex
 
 from marshmallow import Schema, ValidationError
@@ -12,28 +12,28 @@ from services.middlewares import MiddlewareKeeper, DBSessionFinisherMiddleware
 from services.schemes import FullUserSchema
 
 
-class Router(ABC):
-    def __call__(self, data: dict) -> any:
+class Router(IRouter, ABC):
+    def __call__(self, data: dict | Iterable) -> any:
         return self._handle_cleaned_data(self._get_cleaned_data_from(data))
 
     @abstractmethod
-    def _get_cleaned_data_from(self, data: dict) -> dict:
+    def _get_cleaned_data_from(self, data: dict | Iterable) -> dict | Iterable:
         pass
 
     @abstractmethod
-    def _handle_cleaned_data(self, data: dict) -> any:
+    def _handle_cleaned_data(self, data: dict | Iterable) -> any:
         pass
 
 
 class MiddlewareRouter(Router, MiddlewareKeeper, ABC):
-    def __call__(self, data: dict) -> any:
+    def __call__(self, data: dict | Iterable) -> any:
         self._proxy_middleware.call_route(super().__call__, data)
 
 
 class SchemaRouter(Router, ABC):
     _schema: Schema
 
-    def _get_cleaned_data_from(self, data: dict) -> dict:
+    def _get_cleaned_data_from(self, data: dict | Iterable) -> dict | Iterable:
         errors = self._schema.validate(data)
 
         if errors:
@@ -43,23 +43,28 @@ class SchemaRouter(Router, ABC):
 
 
 class UserDataGetterRouter(SchemaRouter):
-    _schema = FullUserSchema(many=False, exclude=('password', 'password_hash'))
+    _schema = FullUserSchema(many=True, exclude=('password', 'password_hash'))
 
-    def _handle_cleaned_data(self, data: dict) -> dict:
-        user = User.query.filter_by(**data).first()
-        
-        if not user:
-            raise UserDoesntExistError(
-                "User with data ({data}) does not exist".format(
-                    user_data=format_dict(
-                        data,
-                        line_between_key_and_value='=',
-                        value_changer=lambda value: f'"{value}"'
+    def _handle_cleaned_data(self, data: Iterable) -> list[dict]:
+        user_data = list()
+
+        for user_data in data:
+            user = User.query.filter_by(**data).first()
+            
+            if not user:
+                raise UserDoesntExistError(
+                    "User with data ({data}) does not exist".format(
+                        user_data=format_dict(
+                            data,
+                            line_between_key_and_value='=',
+                            value_changer=lambda value: f'"{value}"'
+                        )
                     )
                 )
-            )
 
-        return self._schema.dump(user)
+            user_data.append(self._schema.dump(user))
+
+        return user_data
 
 
 class UserRegistrarRouter(MiddlewareRouter):
