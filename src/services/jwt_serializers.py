@@ -6,7 +6,7 @@ from datetime import datetime
 from services.abstractions.interfaces import IJWTSerializator
 
 
-class JWTSerializator:
+class JWTSerializator(IJWTSerializator):
     def __init__(self, key: str, is_symmetric: bool = True):
         self.key = key
         self.is_symmetric = is_symmetric
