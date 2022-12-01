@@ -109,7 +109,7 @@ class UserRegistrarRouter(DBRouter, SchemaRouter):
 
         return data
 
-    def _handle_cleaned_data(self, data: dict) -> str:
+    def _handle_cleaned_data(self, data: dict) -> None:
         if User.query.filter_by(url_token=data['url_token']).first():
             raise UserAlreadyExistsError(
                 f"User with \"{data['url_token']}\" url token already exists"
@@ -121,4 +121,5 @@ class UserRegistrarRouter(DBRouter, SchemaRouter):
         self.database.session.add(user_refresh_token)
         self.database.session.add(user)
 
-        return user_refresh_token.body
+        set_cookie('refresh_token', user_refresh_token.body, httponly=True)
+        set_cookie('access_token', self.user_access_token_factory(user), httponly=True)
