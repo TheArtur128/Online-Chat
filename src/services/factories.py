@@ -3,6 +3,8 @@ from datetime import datetime
 from typing import Callable, Iterable
 
 from models import Token
+from services.abstractions.interfaces import IJWTCoder
+from services.utils import get_time_after
 
 
 class ArgumentFactory(ABC):
@@ -100,3 +102,14 @@ class CustomMinuteTokenFactory(MinuteTokenFactory):
     def _create_token_body(self) -> str:
         return self.token_body_factory()
 
+
+class UserAccessTokenFactory:
+    def __init__(self, jwt_coder: IJWTCoder, life_minutes: int | float):
+        self.jwt_coder = jwt_coder
+        self.life_minutes = life_minutes
+
+    def __call__(self, user: User) -> str:
+        return self.jwt_coder.encode({
+            'url_token': user.url_token,
+            'exp': get_time_after(self.life_minutes, is_time_raw=True)
+        })
