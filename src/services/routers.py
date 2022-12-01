@@ -67,16 +67,17 @@ class UserDataGetterRouter(SchemaRouter):
         return user_data
 
 
-class UserRegistrarRouter(MiddlewareRouter):
-    _middleware_attribute_names = (*MiddlewareRouter._middleware_attribute_names, '_db_session_middleware')
+class DBRouter(MiddlewareRouter):
+    _db_session_middleware_factory: Callable[[SQLAlchemy], DBSessionFinisherMiddleware] = DBSessionFinisherMiddleware
 
-    _db_session_middleware = DBSessionFinisherMiddleware(db)
-    _schema = FullUserSchema(many=False, exclude=('password_hash', ))
-
-    __user_refresh_token_factory: Callable[[], Token] = CustomMinuteTokenFactory(
-        60*24*30,
-        CustomArgumentFactory(token_hex, Token.body.comparator.type.length // 2)
+    _middleware_attribute_names = (
+        *MiddlewareRouter._middleware_attribute_names,
+        '_db_session_middleware'
     )
+
+    def __init__(self, database: SQLAlchemy):
+        self._db_session_middleware = self._db_session_middleware_factory(database)
+        super().__init__()
 
     @property
     def database(self) -> SQLAlchemy:
@@ -86,6 +87,9 @@ class UserRegistrarRouter(MiddlewareRouter):
     def database(self, database: SQLAlchemy) -> None:
         self._db_session_middleware.database = database
 
+
+class UserRegistrarRouter(DBRouter, SchemaRouter):
+    _schema = FullUserSchema(many=False, exclude=('password_hash', ))
     def _get_cleaned_data_from(self, data: dict) -> dict:
         data = super()._get_cleaned_data_from(data)
 
