@@ -13,3 +13,8 @@ class IJWTCoder(ABC):
     def encode(self, data: dict) -> str:
         pass
 
+
+class IJWTDecoder(ABC):
+    @abstractmethod
+    def decode(self, token: str) -> dict:
+        pass
