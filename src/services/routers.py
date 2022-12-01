@@ -6,7 +6,7 @@ from marshmallow import Schema, ValidationError
 from flask_sqlalchemy import SQLAlchemy
 
 from models import db, User, Token
-from services.abstractions.interfaces import IRouter
+from services.abstractions.interfaces import IRouter, IJWTCoder
 from services.factories import CustomMinuteTokenFactory, CustomArgumentFactory
 from services.middlewares import MiddlewareKeeper, DBSessionFinisherMiddleware
 from services.schemes import FullUserSchema
@@ -90,6 +90,17 @@ class DBRouter(MiddlewareRouter):
 
 class UserRegistrarRouter(DBRouter, SchemaRouter):
     _schema = FullUserSchema(many=False, exclude=('password_hash', ))
+
+    def __init__(
+        self,
+        jwt_coder: IJWTCoder,
+        user_refresh_token_factory: Callable[[], Token],
+        user_access_token_factory: Callable[[User], str]
+    ):
+        self.jwt_coder = jwt_coder
+        self.user_refresh_token_factory = user_refresh_token_factory
+        self.user_access_token_factory = user_access_token_factory
+
     def _get_cleaned_data_from(self, data: dict) -> dict:
         data = super()._get_cleaned_data_from(data)
 
@@ -104,7 +115,7 @@ class UserRegistrarRouter(DBRouter, SchemaRouter):
                 f"User with \"{data['url_token']}\" url token already exists"
             )
 
-        user_refresh_token = self.__user_token_factory()
+        user_refresh_token = self.user_refresh_token_factory()
         user = User(refresh_token=user_refresh_token, **data)
 
         self.database.session.add(user_refresh_token)
