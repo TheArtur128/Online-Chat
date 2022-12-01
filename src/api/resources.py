@@ -1,27 +1,27 @@
-from typing import Callable
+from typing import Callable, Iterable
 
 from flask_restful import Resource
-from flask import request, set_cookie
+from flask import request
 
-from services.middlewares import ServiceErrorMiddleware
+from models import db
+from services.factories import DEFAULT_REFRESH_TOKEN_FACTORY, DEFAULT_ACCESS_TOKEN_FACTORY
+from services.middlewares import MiddlewareKeeper, ServiceErrorMiddleware
 from services.routers import UserDataGetterRouter, UserRegistrarRouter
 
 
-class UserResource(Resource):
-    user_data_getter: Callable[[dict], dict] = UserDataGetterRouter()
-    user_registrar: Callable[[dict], any] = UserRegistrarRouter()
+class RoutResource(MiddlewareKeeper, Resource):
+    _internal_middlewares = (ServiceErrorMiddleware(), )
 
-    @ServiceErrorMiddleware().decorate
-    def get(self):
-        return (
-            self.user_data_getter(user_data)
-            for user_data in request.json
-        )
+    def __init__(self, *args, **kwargs):
+        super().__init__()
 
-    @ServiceErrorMiddleware().decorate
-    def post(self):
-        refresh_token = self.user_registrar(request.json)
-        
-        set_cookie('refresh_token', refresh_token, httponly=True)
+        for method_name in self.methods:
+            method_name = method_name.lower()
 
-        return {'refresh_token': refresh_token}, 201
+            setattr(
+                self,
+                method_name,
+                self._proxy_middleware.decorate(getattr(self, method_name))
+            )
+
+        super(Resource, self).__init__()
