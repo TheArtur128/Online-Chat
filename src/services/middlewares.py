@@ -44,6 +44,14 @@ class MiddlewareKeeper(ABC):
     def __init__(self):
         self._update_middlewares()
 
+    @property
+    def _middlewares(self) -> Middleware:
+        return tuple(self.__proxy_middleware.middlewares)
+
+    @property
+    def _proxy_middleware(self) -> ProxyMiddleware:
+        return self.__proxy_middleware
+
     def _update_middlewares(self) -> None:
         self.__proxy_middleware = self._proxy_middleware_factory(tuple(self.__parse_middlewares()))
 
@@ -62,14 +70,6 @@ class MiddlewareKeeper(ABC):
                 middlewares.append(attribute_value)
 
         return middlewares
-
-    @property
-    def _middlewares(self) -> Middleware:
-        return tuple(self.__proxy_middleware.middlewares)
-
-    @property
-    def _proxy_middleware(self) -> ProxyMiddleware:
-        return self.__proxy_middleware
 
 
 class ServiceErrorMiddleware(Middleware):
