@@ -6,9 +6,11 @@ from flask_sqlalchemy import SQLAlchemy
 from flask import request
 
 from models import User, Token
-from services.abstractions.interfaces import IRouter, IJWTCoder
+from services.abstractions.interfaces import IRouter
 from services.middlewares import MiddlewareKeeper, DBSessionFinisherMiddleware
 from services.schemes import FullUserSchema
+from services.errors import UserDoesntExistError, UserAlreadyExistsError
+from services.formatters import format_dict
 
 
 class Router(IRouter, ABC):
