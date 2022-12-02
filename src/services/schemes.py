@@ -43,6 +43,7 @@ class BaseUserSchema(Schema):
 class FullUserSchema(BaseUserSchema):
     name = fields.String(
         validate=[create_length_validator_by_model_column(User, 'name')]
+        required=True,
     )
 
     avatar_path = fields.String(
