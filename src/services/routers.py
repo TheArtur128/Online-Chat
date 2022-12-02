@@ -26,7 +26,7 @@ class Router(IRouter, ABC):
         pass
 
 
-class MiddlewareRouter(Router, MiddlewareKeeper, ABC):
+class MiddlewareRouter(MiddlewareKeeper, Router, ABC):
     def __call__(self) -> any:
         return self._proxy_middleware.call_route(super().__call__)
 
