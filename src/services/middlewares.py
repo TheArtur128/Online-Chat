@@ -32,7 +32,7 @@ class ProxyMiddleware(Middleware):
         for middleware in self.middlewares:
             call_layer = CustomArgumentFactory(middleware.call_route, call_layer)
 
-        call_layer(*args, **kwargs)
+        return call_layer(*args, **kwargs)
 
 
 class MiddlewareKeeper(ABC):

@@ -26,7 +26,7 @@ class Router(IRouter, ABC):
 
 class MiddlewareRouter(Router, MiddlewareKeeper, ABC):
     def __call__(self) -> any:
-        self._proxy_middleware.call_route(super().__call__)
+        return self._proxy_middleware.call_route(super().__call__)
 
 
 class SchemaRouter(Router, ABC):
