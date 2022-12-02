@@ -94,11 +94,12 @@ class UserRegistrarRouter(DBRouter, SchemaRouter):
 
     def __init__(
         self,
-        jwt_coder: IJWTCoder,
+        database: SQLAlchemy,
         user_refresh_token_factory: Callable[[], Token],
         user_access_token_factory: Callable[[User], str]
     ):
-        self.jwt_coder = jwt_coder
+        super().__init__(database)
+
         self.user_refresh_token_factory = user_refresh_token_factory
         self.user_access_token_factory = user_access_token_factory
 
