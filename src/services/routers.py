@@ -1,13 +1,10 @@
 from abc import ABC, abstractmethod
-from typing import Callable, Iterable, NamedTuple
-from secrets import token_hex
 
 from marshmallow import Schema, ValidationError
 from flask_sqlalchemy import SQLAlchemy
 
-from models import db, User, Token
+from models import User, Token
 from services.abstractions.interfaces import IRouter, IJWTCoder
-from services.factories import CustomMinuteTokenFactory, CustomArgumentFactory
 from services.middlewares import MiddlewareKeeper, DBSessionFinisherMiddleware
 from services.schemes import FullUserSchema
 

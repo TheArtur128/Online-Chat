@@ -1,7 +1,4 @@
-from typing import Callable, Iterable
-
 from flask_restful import Resource
-from flask import request
 
 from models import db
 from services.factories import DEFAULT_REFRESH_TOKEN_FACTORY, DEFAULT_ACCESS_TOKEN_FACTORY
