@@ -1,7 +1,9 @@
 from abc import ABC, abstractmethod
+from typing import Callable, Iterable
 
 from marshmallow import Schema, ValidationError
 from flask_sqlalchemy import SQLAlchemy
+from flask import request
 
 from models import User, Token
 from services.abstractions.interfaces import IRouter, IJWTCoder
@@ -10,8 +12,8 @@ from services.schemes import FullUserSchema
 
 
 class Router(IRouter, ABC):
-    def __call__(self, data: dict | Iterable) -> any:
-        return self._handle_cleaned_data(self._get_cleaned_data_from(data))
+    def __call__(self) -> any:
+        return self._handle_cleaned_data(self._get_cleaned_data_from(request.json))
 
     @abstractmethod
     def _get_cleaned_data_from(self, data: dict | Iterable) -> dict | Iterable:
@@ -23,8 +25,8 @@ class Router(IRouter, ABC):
 
 
 class MiddlewareRouter(Router, MiddlewareKeeper, ABC):
-    def __call__(self, data: dict | Iterable) -> any:
-        self._proxy_middleware.call_route(super().__call__, data)
+    def __call__(self) -> any:
+        self._proxy_middleware.call_route(super().__call__)
 
 
 class SchemaRouter(Router, ABC):
