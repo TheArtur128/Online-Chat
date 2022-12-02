@@ -122,3 +122,5 @@ class UserRegistrarRouter(DBRouter, SchemaRouter):
 
         set_cookie('refresh_token', user_refresh_token.body, httponly=True)
         set_cookie('access_token', self.user_access_token_factory(user), httponly=True)
+
+        return dict(), 201
