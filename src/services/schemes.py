@@ -34,16 +34,22 @@ class BaseUserSchema(Schema):
 
     password_hash = fields.String(
         required=True,
-        validate=[create_length_validator_by_model_column(User, 'password_hash')]
+        validate=[create_length_validator_by_model_column(User, 'password_hash')],
+        error_messages={'required': "Password hash is required."}
     )
 
-    password = fields.String(required=True, dump_only=True)
+    password = fields.String(
+        required=True,
+        dump_only=True,
+        error_messages={'required': "Password is required."}
+    )
 
 
 class FullUserSchema(BaseUserSchema):
     name = fields.String(
-        validate=[create_length_validator_by_model_column(User, 'name')]
         required=True,
+        validate=[create_length_validator_by_model_column(User, 'name')],
+        error_messages={'required': "Name hash is required."}
     )
 
     avatar_path = fields.String(
