@@ -124,7 +124,12 @@ class UserRegistrarRouter(DBRouter, SchemaRouter):
         self.database.session.add(user_refresh_token)
         self.database.session.add(user)
 
+        return self._create_response_by(
+            user_refresh_token.body,
+            self.user_access_token_factory(user)
+        )
 
+    def _create_response_by(self, refresh_token: str, access_token: str) -> Response:
         response = make_response(
             jsonify({
                 'refresh_token': refresh_token,
