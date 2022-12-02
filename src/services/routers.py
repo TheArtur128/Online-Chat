@@ -46,26 +46,26 @@ class SchemaRouter(Router, ABC):
 class UserDataGetterRouter(SchemaRouter):
     _schema = FullUserSchema(many=True, exclude=('password', 'password_hash'))
 
-    def _handle_cleaned_data(self, data: Iterable) -> list[dict]:
-        user_data = list()
+    def _handle_cleaned_data(self, data: Iterable[dict]) -> list[dict]:
+        filtered_user_data = list()
 
         for user_data in data:
-            user = User.query.filter_by(**data).first()
+            user = User.query.filter_by(**user_data).first()
             
             if not user:
                 raise UserDoesntExistError(
-                    "User with data ({data}) does not exist".format(
+                    "User with data ({user_data}) does not exist".format(
                         user_data=format_dict(
-                            data,
+                            user_data,
                             line_between_key_and_value='=',
                             value_changer=lambda value: f'"{value}"'
                         )
                     )
                 )
 
-            user_data.append(self._schema.dump(user))
+            filtered_user_data.append(self._schema.dump(user))
 
-        return user_data
+        return filtered_user_data
 
 
 class DBRouter(MiddlewareRouter):
