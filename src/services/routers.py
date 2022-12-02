@@ -3,7 +3,8 @@ from typing import Callable, Iterable
 
 from marshmallow import Schema, ValidationError
 from flask_sqlalchemy import SQLAlchemy
-from flask import request
+from flask import request, make_response, Response, jsonify
+from werkzeug.security import generate_password_hash
 
 from models import User, Token
 from services.abstractions.interfaces import IRouter
@@ -111,7 +112,7 @@ class UserRegistrarRouter(DBRouter, SchemaRouter):
 
         return data
 
-    def _handle_cleaned_data(self, data: dict) -> None:
+    def _handle_cleaned_data(self, data: dict) -> Response:
         if User.query.filter_by(url_token=data['url_token']).first():
             raise UserAlreadyExistsError(
                 f"User with \"{data['url_token']}\" url token already exists"
@@ -123,7 +124,16 @@ class UserRegistrarRouter(DBRouter, SchemaRouter):
         self.database.session.add(user_refresh_token)
         self.database.session.add(user)
 
-        set_cookie('refresh_token', user_refresh_token.body, httponly=True)
-        set_cookie('access_token', self.user_access_token_factory(user), httponly=True)
 
-        return dict(), 201
+        response = make_response(
+            jsonify({
+                'refresh_token': refresh_token,
+                'access_token': access_token
+            }),
+            201
+        )
+
+        response.set_cookie('refresh_token', refresh_token, httponly=True)
+        response.set_cookie('access_token', access_token, httponly=True)
+
+        return response
