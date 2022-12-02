@@ -69,7 +69,7 @@ class User(db.Model, _FormattedUrlModelMixin):
     avatar_path = db.Column(db.String(512))
     description = db.Column(db.String(256))
 
-    refresh_token = db.relationship('tokens', foreign_keys=(refresh_token_id, ))
+    refresh_token = db.relationship('Token', foreign_keys=(refresh_token_id, ))
     chats = db.relationship('Chat', secondary=chat_member_table, back_populates='members')
     roles = db.relationship('ChatRole', secondary=chat_member_role_table, back_populates='actors')
 
