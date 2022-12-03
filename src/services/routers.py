@@ -64,7 +64,7 @@ class UserDataGetterRouter(SchemaRouter):
                     )
                 )
 
-            filtered_user_data.append(self._schema.dump(user))
+            filtered_user_data.append(self._schema.dump(user, many=False))
 
         return filtered_user_data
 
