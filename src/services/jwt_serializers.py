@@ -7,9 +7,10 @@ from services.abstractions.interfaces import IJWTSerializator
 
 
 class JWTSerializator(IJWTSerializator):
-    def __init__(self, key: str, is_symmetric: bool = True):
+    def __init__(self, key: str, is_symmetric: bool = True, leeway: int | float = 0):
         self.key = key
         self.is_symmetric = is_symmetric
+        self.leeway = leeway
 
     @property
     def algorithm(self) -> str:
@@ -19,4 +20,4 @@ class JWTSerializator(IJWTSerializator):
         return encode(data, key=self.key, algorithm=self.algorithm)
 
     def decode(self, token: str) -> dict:
-        return decode(token, key=self.key, algorithms=self.algorithm)
+        return decode(token, key=self.key, algorithms=(self.algorithm, ), leeway=self.leeway)
