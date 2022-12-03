@@ -3,6 +3,7 @@ from typing import Callable, Optional, Iterable
 from functools import wraps
 
 from flask_sqlalchemy import SQLAlchemy
+from flask import Response, abort, jsonify, request, redirect, url_for
 from marshmallow import ValidationError
 
 from services.factories import CustomArgumentFactory
@@ -72,17 +73,22 @@ class ServiceErrorFormatterMiddleware(Middleware):
     def call_route(self, route: Callable, *args, **kwargs) -> any:
         try:
             return route(*args, **kwargs)
+
         except StatusCodeError as error:
-            return (
-                (
-                    error.messages
-                    if isinstance(error, ValidationError)
-                    else {'message': str(error)}
-                ),
-                error.status_code
+            status_code = error.status_code
+            response = jsonify(
+                error.messages
+                if isinstance(error, ValidationError)
+                else {'message': str(error)}
             )
+
         except ValidationError as error:
-            return error.messages, 400
+            status_code = 400
+            response = jsonify(error.messages)
+
+        response.status = status_code
+
+        return response
 
 
 class DBMiddleware(Middleware, ABC):
