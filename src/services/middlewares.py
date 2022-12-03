@@ -68,7 +68,7 @@ class MiddlewareKeeper(ABC):
         return middlewares
 
 
-class ServiceErrorMiddleware(Middleware):
+class ServiceErrorFormatterMiddleware(Middleware):
     def call_route(self, route: Callable, *args, **kwargs) -> any:
         try:
             return route(*args, **kwargs)
