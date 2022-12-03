@@ -46,11 +46,7 @@ class BaseUserSchema(Schema):
 
 
 class FullUserSchema(BaseUserSchema):
-    name = fields.String(
-        required=True,
-        validate=[create_length_validator_by_model_column(User, 'name')],
-        error_messages={'required': "Name hash is required."}
-    )
+    name = fields.String(validate=[create_length_validator_by_model_column(User, 'name')])
 
     avatar_path = fields.String(
         allow_none=True,

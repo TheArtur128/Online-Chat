@@ -110,6 +110,8 @@ class UserRegistrarRouter(DBRouter, SchemaRouter):
         data['password_hash'] = generate_password_hash(data['password'])
         del data['password']
 
+        data['name'] = data.get('name') or data.get('url_token')
+
         return data
 
     def _handle_cleaned_data(self, data: dict) -> Response:
