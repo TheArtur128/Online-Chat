@@ -6,6 +6,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask import Response, abort, jsonify, request, redirect, url_for
 from marshmallow import ValidationError
 from jwt.exceptions import InvalidTokenError
+from werkzeug.routing.exceptions import BuildError
 
 from services.abstractions.interfaces import IJWTDecoder
 from services.factories import CustomArgumentFactory
@@ -141,3 +142,29 @@ class AccessTokenRequiredMiddleware(Middleware):
             raise AccessTokenInvalidError('Access token is invalid')
 
         return route(*args, **kwargs)
+
+
+class StatusCodeRedirectorMiddleware(Middleware):
+    def __init__(self, redirect_resource: str, status_codes: Iterable[int] | int):
+        self.redirect_resource = redirect_resource
+        self.status_codes = (
+            tuple(status_codes)
+            if isinstance(status_codes, Iterable)
+            else (status_codes, )
+        )
+
+    @property
+    def redirect_url(self) -> str:
+        try:
+            return url_for(self.redirect_resource)
+        except BuildError:
+            return self.redirect_resource
+
+    def call_route(self, route: Callable, *args, **kwargs) -> any:
+        response = route(*args, **kwargs)
+
+        return (
+            redirect(self.redirect_url)
+            if get_status_code_from(response) in self.status_codes
+            else response
+        )
