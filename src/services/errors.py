@@ -10,6 +10,10 @@ class StatusCodeError(ServiceError, ABC):
 
 
 class AuthenticationError(StatusCodeError):
+    status_code = 403
+
+
+class AuthorizationError(StatusCodeError):
     status_code = 401
 
 
