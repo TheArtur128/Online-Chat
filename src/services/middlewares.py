@@ -8,6 +8,7 @@ from marshmallow import ValidationError
 
 from services.factories import CustomArgumentFactory
 from services.errors import StatusCodeError
+from services.utils import get_status_code_from
 
 
 class Middleware(ABC):
@@ -87,6 +88,18 @@ class ServiceErrorFormatterMiddleware(Middleware):
             response = jsonify(error.messages)
 
         response.status = status_code
+
+        return response
+
+
+class AbortBadStatusCodeMiddleware(Middleware):
+    def call_route(self, route: Callable, *args, **kwargs) -> any:
+        response = route(*args, **kwargs)
+
+        status_code = get_status_code_from(response)
+
+        if 400 <= status_code <= 500:
+            abort(status_code)
 
         return response
 
