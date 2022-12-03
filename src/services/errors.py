@@ -1,11 +1,11 @@
 from abc import ABC
 
 
-class SeviceError(Exception):
+class ServiceError(Exception):
     pass
 
 
-class StatusCodeError(SeviceError, ABC):
+class StatusCodeError(ServiceError, ABC):
     status_code: int
 
 
@@ -13,11 +13,11 @@ class AuthenticationError(StatusCodeError):
     status_code = 401
 
 
-class ResorceSeviceError(SeviceError):
+class ResorceServiceError(ServiceError):
     pass
 
 
-class UserNotFoundError(ResorceSeviceError, StatusCodeError):
+class UserNotFoundError(ResorceServiceError, StatusCodeError):
     status_code = 404
 
 
