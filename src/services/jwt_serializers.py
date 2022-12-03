@@ -16,8 +16,8 @@ class JWTSerializator(IJWTSerializator):
     def algorithm(self) -> str:
         return 'HS256' if self.is_symmetric else 'RS256'
 
-    def encode(self, data: dict) -> str:
-        return encode(data, key=self.key, algorithm=self.algorithm)
+    def encode(self, data: dict, *, headers: dict = dict()) -> str:
+        return encode(data, key=self.key, algorithm=self.algorithm, headers=headers)
 
     def decode(self, token: str) -> dict:
         return decode(token, key=self.key, algorithms=(self.algorithm, ), leeway=self.leeway)
