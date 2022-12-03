@@ -54,12 +54,10 @@ class FullUserSchema(BaseUserSchema):
 
     avatar_path = fields.String(
         allow_none=True,
-        dump_default=None,
         validate=[create_length_validator_by_model_column(User, 'avatar_path')],
     )
     
     description = fields.String(
         allow_none=True,
-        dump_default=None,
         validate=[create_length_validator_by_model_column(User, 'description')]
     )
