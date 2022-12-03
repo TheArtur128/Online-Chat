@@ -5,9 +5,11 @@ from functools import wraps
 from flask_sqlalchemy import SQLAlchemy
 from flask import Response, abort, jsonify, request, redirect, url_for
 from marshmallow import ValidationError
+from jwt.exceptions import InvalidTokenError
 
+from services.abstractions.interfaces import IJWTDecoder
 from services.factories import CustomArgumentFactory
-from services.errors import StatusCodeError
+from services.errors import StatusCodeError, AccessTokenInvalidError
 from services.utils import get_status_code_from
 
 
@@ -121,3 +123,21 @@ class DBSessionFinisherMiddleware(DBMiddleware):
             self.database.session.rollback()
 
             raise error
+
+
+class AccessTokenRequiredMiddleware(Middleware):
+    def __init__(self, jwt_decoder: IJWTDecoder):
+        self.jwt_decoder = jwt_decoder
+
+    def call_route(self, route: Callable, *args, **kwargs) -> any:
+        access_token = request.cookies.get('access_token') or request.headers.get('access_token')
+
+        if not access_token:
+            raise AccessTokenInvalidError('Access token is missing')
+
+        try:
+            self.jwt_decoder.decode(access_token)
+        except InvalidTokenError:
+            raise AccessTokenInvalidError('Access token is invalid')
+
+        return route(*args, **kwargs)
