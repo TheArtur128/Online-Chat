@@ -31,3 +31,7 @@ class UserAlreadyExistsError(StatusCodeError):
 
 class UserDoesntExistError(StatusCodeError):
     status_code = 404
+
+
+class AccessTokenInvalidError(AuthorizationError):
+    pass
