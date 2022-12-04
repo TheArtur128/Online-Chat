@@ -72,7 +72,7 @@ class MiddlewareAppRegistrar(IMiddlewareAppRegistrar):
     _config_field_names: dict[str, str] = {
         'middlewares': 'MIDDLEWARES',
         'default_view_names': 'MIDDLEWARE_VIEW_NAMES',
-        'default_blueprints': 'DEFAULT_BLUEPRINTS',
+        'default_blueprints': 'MIDDLEWARE_BLUEPRINTS',
         'is_global_middlewares_higher': 'IS_GLOBAL_MIDDLEWARES_HIGHER',
         'is_blueprint_middlewares_higher': 'IS_BLUEPRINT_MIDDLEWARES_HIGHER',
         'blueprint_key': 'BLUEPRINT_MIDDLEWARES',
