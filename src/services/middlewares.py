@@ -76,6 +76,7 @@ class MiddlewareAppRegistrar(IMiddlewareAppRegistrar):
         'default_view_names': 'MIDDLEWARE_VIEW_NAMES',
         'default_blueprints': 'MIDDLEWARE_BLUEPRINTS',
         'is_using_global': 'USE_GLOBAL_MIDDLEWARES',
+        'use_for_blueprint': 'USE_FOR_BLUEPRINT',
         'is_global_middlewares_higher': 'IS_GLOBAL_MIDDLEWARES_HIGHER',
         'is_environment_middlewares_higher': 'IS_ENVIRONMENT_MIDDLEWARES_HIGHER'
     }
@@ -123,6 +124,7 @@ class MiddlewareAppRegistrar(IMiddlewareAppRegistrar):
         default_view_names: Optional[Iterable[str] | BinarySet] = None,
         default_blueprints: Optional[Iterable[str | Blueprint] | BinarySet] = None,
         is_using_global: Optional[bool] = None,
+        use_for_blueprint: Optional[bool, str, Blueprint] = None,
         is_global_middlewares_higher: Optional[bool] = None,
         is_environment_middlewares_higher: Optional[bool] = None,
         **kwargs
@@ -136,6 +138,7 @@ class MiddlewareAppRegistrar(IMiddlewareAppRegistrar):
             if config is None:
                 raise MiddlewareRegistrarConfigError(f"Environment \"{environment}\" missing")
 
+            environment_global_middlewares = cls.__get_global_middlewares_from(config)
 
             if (
                 config.get(cls._config_field_names['is_environment_middlewares_higher'], False)
@@ -179,6 +182,30 @@ class MiddlewareAppRegistrar(IMiddlewareAppRegistrar):
 
         if default_blueprints is None:
             default_blueprints = config.get(cls._config_field_names['default_blueprints'])
+
+        use_for_blueprint = (
+            config.get(cls._config_field_names['use_for_blueprint'], False)
+            if use_for_blueprint is None
+            else use_for_blueprint
+        )
+
+        if use_for_blueprint:
+            if isinstance(use_for_blueprint, bool) and use_for_blueprint:
+                if environment is not None:
+                    raise MiddlewareRegistrarConfigError(
+                        "There is no implicit reference to the blueprint"
+                    )
+
+                use_for_blueprint = environment
+
+            if default_blueprints is None:
+                default_blueprints = (use_for_blueprint, )
+
+            elif isinstance(default_blueprints, BinarySet):
+                default_blueprints.including.add(use_for_blueprint)
+
+            elif isinstance(default_blueprints, Iterable):
+                default_blueprints = (*default_blueprints, use_for_blueprint)
 
         return cls(
             middlewares,
