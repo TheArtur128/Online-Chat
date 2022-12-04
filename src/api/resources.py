@@ -1,7 +1,7 @@
 from flask_restful import Resource
 
 from models import db
-from services.factories import DEFAULT_REFRESH_TOKEN_FACTORY, DEFAULT_ACCESS_TOKEN_FACTORY
+from config import DEFAULT_REFRESH_TOKEN_FACTORY, DEFAULT_ACCESS_TOKEN_FACTORY
 from services.middlewares import MiddlewareKeeper, ServiceErrorFormatterMiddleware
 from services.routers import UserDataGetterRouter, UserRegistrarRouter
 
