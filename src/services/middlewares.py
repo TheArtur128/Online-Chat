@@ -71,11 +71,12 @@ class MiddlewareAppRegistrar(IMiddlewareAppRegistrar):
     _proxy_middleware_factory: Callable[[Iterable[Middleware]], Middleware] = ProxyMiddleware
     _config_field_names: dict[str, str] = {
         'middlewares': 'MIDDLEWARES',
+        'global_middlewares': 'GLOBAL_MIDDLEWARES',
         'environments': 'MIDDLEWARE_ENVIRONMENTS',
         'default_view_names': 'MIDDLEWARE_VIEW_NAMES',
         'default_blueprints': 'MIDDLEWARE_BLUEPRINTS',
+        'is_using_global': 'USE_GLOBAL_MIDDLEWARES',
         'is_global_middlewares_higher': 'IS_GLOBAL_MIDDLEWARES_HIGHER',
-        'is_blueprint_middlewares_higher': 'IS_BLUEPRINT_MIDDLEWARES_HIGHER',
         'is_environment_middlewares_higher': 'IS_ENVIRONMENT_MIDDLEWARES_HIGHER'
     }
 
@@ -121,12 +122,12 @@ class MiddlewareAppRegistrar(IMiddlewareAppRegistrar):
         environment: Optional[str] = None,
         default_view_names: Optional[Iterable[str] | BinarySet] = None,
         default_blueprints: Optional[Iterable[str | Blueprint] | BinarySet] = None,
+        is_using_global: Optional[bool] = None,
         is_global_middlewares_higher: Optional[bool] = None,
-        for_blueprint: Optional[str] = None
         is_environment_middlewares_higher: Optional[bool] = None,
         **kwargs
     ) -> Self:
-        global_middlewares = tuple()
+        global_middlewares = cls.__get_global_middlewares_from(config)
 
         if environment is not None:
             global_middlewares = cls.__get_global_middlewares_from(config)
@@ -135,27 +136,43 @@ class MiddlewareAppRegistrar(IMiddlewareAppRegistrar):
             if config is None:
                 raise MiddlewareRegistrarConfigError(f"Environment \"{environment}\" missing")
 
-            additional_global_middlewares = cls.__get_global_middlewares_from(config)
 
             if (
-                config.get(cls._config_field_names['is_blueprint_middlewares_higher'], True)
-                if is_blueprint_middlewares_higher is None
-                else is_blueprint_middlewares_higher
+                config.get(cls._config_field_names['is_environment_middlewares_higher'], False)
+                if is_environment_middlewares_higher is None
+                else is_environment_middlewares_higher
             ):
-                global_middlewares = additional_global_middlewares + global_middlewares
+                global_middlewares = environment_global_middlewares + global_middlewares
             else:
-                global_middlewares += additional_global_middlewares
+                global_middlewares += environment_global_middlewares
+     
+        middlewares = config.get(cls._config_field_names['middlewares'])
 
-        middleware_packs = [global_middlewares, middlewares]
+        if middlewares is None and not global_middlewares:
+            raise MiddlewareRegistrarConfigError(
+                "{config_name} doesn't have any available middlewares".format(
+                    config_name=(
+                        'The config' if environment is None
+                        else f'Environment \"{environment}\"'
+                    )
+                )
+            )
 
-        if not (
-            config.get(cls._config_field_names['is_global_middlewares_higher'], True)
-            if is_global_middlewares_higher is None
-            else is_global_middlewares_higher
+        if (
+            config.get(cls._config_field_names['is_using_global'], True)
+            if is_using_global is None
+            else is_using_global
         ):
-            middleware_packs.reverse()
+            middleware_packs = [global_middlewares, middlewares]
 
-        parsed_args = (*middleware_packs[0], *middleware_packs[1])
+            if not (
+                config.get(cls._config_field_names['is_global_middlewares_higher'], True)
+                if is_global_middlewares_higher is None
+                else is_global_middlewares_higher
+            ):
+                middleware_packs.reverse()
+
+            middlewares = (*middleware_packs[0], *middleware_packs[1])
 
         if default_view_names is None:
             default_view_names = config.get(cls._config_field_names['default_view_names'])
@@ -164,7 +181,7 @@ class MiddlewareAppRegistrar(IMiddlewareAppRegistrar):
             default_blueprints = config.get(cls._config_field_names['default_blueprints'])
 
         return cls(
-            (*middleware_packs[0], *middleware_packs[1]),
+            middlewares,
             *args,
             default_view_names=default_view_names,
             default_blueprints=default_blueprints,
@@ -182,16 +199,9 @@ class MiddlewareAppRegistrar(IMiddlewareAppRegistrar):
             for blueprint in blueprints
         ) if blueprints is not None else blueprints
 
-    @staticmethod
-    def __get_global_middlewares_from(
-        middleware_config: dict[str, Iterable[Middleware]],
-        topic: Optional[str] = None,
-    ) -> tuple[Middleware]:
-        return tuple(
-            middleware_config.get([cls._config_field_names['topics']['global_middlewares']], tuple())
-            if topic != cls._config_field_names['topics']['global_middlewares']
-            else tuple()
-        )
+    @classmethod
+    def __get_global_middlewares_from(cls, config: dict[str, Iterable[Middleware]]) -> tuple[Middleware]:
+        return tuple(config.get(cls._config_field_names['global_middlewares'], tuple()))
 
 
 class MiddlewareKeeper(ABC):
