@@ -36,7 +36,7 @@ def get_time_after(minutes: int, is_time_raw: bool = False) -> datetime | float:
 
 def get_status_code_from(response: any) -> int:
     if isinstance(response, Response):
-        return response.status
+        return response.status_code
     elif (
         isinstance(response, Iterable)
         and len(response) >= 2

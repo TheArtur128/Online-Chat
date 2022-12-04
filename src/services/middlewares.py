@@ -90,7 +90,7 @@ class ServiceErrorFormatterMiddleware(Middleware):
             status_code = 400
             response = jsonify(error.messages)
 
-        response.status = status_code
+        response.status_code = status_code
 
         return response
 
