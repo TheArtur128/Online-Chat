@@ -52,6 +52,21 @@ class IMiddlewareAppRegistrar(ABC):
         pass
 
 
+class ProxyMiddlewareAppRegistrar(IMiddlewareAppRegistrar):
+    def __init__(self, registrars: Iterable[IMiddlewareAppRegistrar]):
+        self.registrars = tuple(registrars)
+
+    def init_app(
+        self,
+        app: Flask,
+        *,
+        for_view_names: Iterable[BinarySet | str] = BinarySet(),
+        for_blueprints: Iterable[BinarySet | str | Blueprint] = BinarySet()
+    ) -> None:
+        for registrar in self.registrars:
+            registrar.init_app(app, for_view_names=for_view_names, for_blueprints=for_blueprints)
+
+
 class MiddlewareAppRegistrar(IMiddlewareAppRegistrar):
     _proxy_middleware_factory: Callable[[Iterable[Middleware]], Middleware] = ProxyMiddleware
     _config_field_names: dict[str, str] = {
