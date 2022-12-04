@@ -40,7 +40,19 @@ class ProxyMiddleware(Middleware):
         return call_layer(*args, **kwargs)
 
 
-class MiddlewareAppRegistrar:
+class IMiddlewareAppRegistrar(ABC):
+    @abstractmethod
+    def init_app(
+        self,
+        app: Flask,
+        *,
+        for_view_names: Iterable[BinarySet | str] = BinarySet(),
+        for_blueprints: Iterable[BinarySet | str | Blueprint] = BinarySet()
+    ) -> None:
+        pass
+
+
+class MiddlewareAppRegistrar(IMiddlewareAppRegistrar):
     _proxy_middleware_factory: Callable[[Iterable[Middleware]], Middleware] = ProxyMiddleware
     _config_field_names: dict[str, str] = {
         'middlewares': 'MIDDLEWARES',
