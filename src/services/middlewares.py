@@ -71,15 +71,12 @@ class MiddlewareAppRegistrar(IMiddlewareAppRegistrar):
     _proxy_middleware_factory: Callable[[Iterable[Middleware]], Middleware] = ProxyMiddleware
     _config_field_names: dict[str, str] = {
         'middlewares': 'MIDDLEWARES',
+        'environments': 'MIDDLEWARE_ENVIRONMENTS',
         'default_view_names': 'MIDDLEWARE_VIEW_NAMES',
         'default_blueprints': 'MIDDLEWARE_BLUEPRINTS',
         'is_global_middlewares_higher': 'IS_GLOBAL_MIDDLEWARES_HIGHER',
         'is_blueprint_middlewares_higher': 'IS_BLUEPRINT_MIDDLEWARES_HIGHER',
-        'blueprint_key': 'BLUEPRINT_MIDDLEWARES',
-        'topics': {
-            'default_middlewares': 'DEFAULT',
-            'global_middlewares': 'GLOBAL'
-        }
+        'is_environment_middlewares_higher': 'IS_ENVIRONMENT_MIDDLEWARES_HIGHER'
     }
 
     def __init__(
@@ -121,29 +118,22 @@ class MiddlewareAppRegistrar(IMiddlewareAppRegistrar):
         cls,
         config: dict,
         *args,
-        topic: Optional[str] = None,
+        environment: Optional[str] = None,
         default_view_names: Optional[Iterable[str] | BinarySet] = None,
         default_blueprints: Optional[Iterable[str | Blueprint] | BinarySet] = None,
         is_global_middlewares_higher: Optional[bool] = None,
-        is_blueprint_middlewares_higher: Optional[bool] = None,
         for_blueprint: Optional[str] = None
-        **kwargs,
+        is_environment_middlewares_higher: Optional[bool] = None,
+        **kwargs
     ) -> Self:
         global_middlewares = tuple()
 
-        if for_blueprint is not None:
+        if environment is not None:
             global_middlewares = cls.__get_global_middlewares_from(config)
-            config = config.get(cls._config_field_names['blueprint_key'], diec()).get(for_blueprint, dict())
-       
-        middlewares = config.get(cls._config_field_names['middlewares'])
+            config = config[cls._config_field_names['environments']].get(environment)
 
-        if middlewares is None:
-            raise MiddlewareRegistrarConfigError(
-                f"The config is missing the required field \"{cls._config_field_names['middlewares']}\""
-            )
-
-        if isinstance(middlewares, dict):
-            middlewares = middlewares[topic or cls._config_field_names['topics']['default_middlewares']]
+            if config is None:
+                raise MiddlewareRegistrarConfigError(f"Environment \"{environment}\" missing")
 
             additional_global_middlewares = cls.__get_global_middlewares_from(config)
 
