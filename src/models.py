@@ -13,13 +13,6 @@ chat_member_table = db.Table(
 )
 
 
-chat_member_role_table = db.Table(
-    'chat_member_roles',
-    db.Column('user_id', db.ForeignKey('users.id')),
-    db.Column('chat_role_id', db.ForeignKey('chat_roles.id')),
-)
-
-
 class _FormattedUrlModelMixin:
     _id_attribute: str = 'id'
     _name_attribute: str = 'name'
@@ -71,7 +64,6 @@ class User(db.Model, _FormattedUrlModelMixin):
 
     refresh_token = db.relationship('Token', foreign_keys=(refresh_token_id, ))
     chats = db.relationship('Chat', secondary=chat_member_table, back_populates='members')
-    roles = db.relationship('ChatRole', secondary=chat_member_role_table, back_populates='actors')
 
 
 class Chat(db.Model, _FormattedUrlModelMixin):
@@ -85,26 +77,6 @@ class Chat(db.Model, _FormattedUrlModelMixin):
 
     members = db.relationship('User', secondary=chat_member_table, back_populates='chats')
     owner = db.relationship('User', foreign_keys=(owner_id, ))
-
-
-class ChatRole(db.Model):
-    __tablename__ = 'chat_roles'
-
-    id = db.Column(db.Integer, primary_key=True)
-    chat_id = db.Column(db.Integer, db.ForeignKey(Chat.id))
-    name = db.Column(db.String(16), nullable=False)
-    description = db.Column(db.String(256))
-    hex_rgb_color = db.Column(db.String(6), nullable=False, default='FFFFFF')
-    role_customization_rights = db.Column(db.Boolean, nullable=False, default=False)
-    user_ban_rights = db.Column(db.Boolean, nullable=False, default=False)
-    message_pinning_rights = db.Column(db.Boolean, nullable=False, default=False)
-    styling_rights = db.Column(db.Boolean, nullable=False, default=False)
-
-    chat = db.relationship('Chat', foreign_keys=(chat_id, ))
-    actors = db.relationship('User', secondary=chat_member_role_table, back_populates='roles')
-
-    def __repr__(self) -> str:
-        return f"ChatRole {self.name} of {self.chat.url_token} chat with rights(customization={self.role_customization_rights}, ban={self.user_ban_rights})"
 
 
 class ChatMessage(db.Model):
