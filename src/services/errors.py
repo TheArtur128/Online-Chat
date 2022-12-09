@@ -5,18 +5,6 @@ class ServiceError(Exception):
     pass
 
 
-class MiddlewareError(ServiceError):
-    pass
-
-
-class MiddlewareAppRegistrarError(MiddlewareError):
-    pass
-
-
-class MiddlewareRegistrarConfigError(MiddlewareAppRegistrarError):
-    pass
-
-
 class StatusCodeError(ServiceError, ABC):
     status_code: int
 
