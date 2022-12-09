@@ -39,11 +39,11 @@ class _FormattedUrlModelMixin:
         return str(getattr(self, self._url_attribute))
 
 
-class Token(db.Model):
-    __tablename__ ='tokens'
+class UserSession(db.Model):
+    __tablename__ ='user_sessions'
 
     id = db.Column(db.Integer, primary_key=True)
-    body = db.Column(db.String(512), nullable=False)
+    token = db.Column(db.String(512), nullable=False)
     cancellation_time = db.Column(db.DateTime, nullable=False)
 
     @property
@@ -55,14 +55,14 @@ class User(db.Model, _FormattedUrlModelMixin):
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True)
-    refresh_token_id = db.Column(db.Integer, db.ForeignKey(Token.id), unique=True, nullable=False)
+    session_id = db.Column(db.Integer, db.ForeignKey(UserSession.id), unique=True, nullable=False)
     url_token = db.Column(db.String(32), nullable=False, unique=True)
     password_hash = db.Column(db.String(1024), nullable=False)
     name = db.Column(db.String(64), nullable=False)
     avatar_path = db.Column(db.String(512))
     description = db.Column(db.String(256))
 
-    refresh_token = db.relationship('Token', foreign_keys=(refresh_token_id, ))
+    session = db.relationship('UserSession', foreign_keys=(session_id, ))
     chats = db.relationship('Chat', secondary=chat_member_table, back_populates='members')
 
 

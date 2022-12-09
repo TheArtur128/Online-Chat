@@ -2,56 +2,53 @@ from abc import ABC, abstractmethod
 from datetime import datetime
 from typing import Callable, Iterable
 
-from models import Token, User
-from services.abstractions.interfaces import IJWTCoder
+from models import UserSession, User
 from services.utils import get_time_after
-from services.jwt_serializers import JWTSerializator
+from services.jwt_serializers import IJWTCoder
 
 
+class UserSessionFactory(ABC):
+    _original_user_session_factory: Callable[[str, datetime], UserSession] = UserSession
 
-
-class TokenFactory(ABC):
-    _original_token_factory: Callable[[str, datetime], Token] = Token
-
-    def __call__(self) -> Token:
+    def __call__(self) -> UserSession:
         return self._original_token_factory(
-            body=self._create_token_body(),
-            cancellation_time=self._get_token_cancellation_time()
+            token=self._create_user_session_token(),
+            cancellation_time=self._get_session_cancellation_time()
         )
 
     @abstractmethod
-    def _create_token_body(self) -> str:
+    def _create_user_session_token(self) -> str:
         pass
 
     @abstractmethod
-    def _get_token_cancellation_time(self) -> datetime:
+    def _get_session_cancellation_time(self) -> datetime:
         pass
 
 
-class MinuteTokenFactory(TokenFactory, ABC):
-    _token_life_minutes: int | float
+class MinuteUserSessionFactory(UserSessionFactory, ABC):
+    _user_session_life_minutes: int | float
 
-    def _get_token_cancellation_time(self) -> datetime:
+    def _get_session_cancellation_time(self) -> datetime:
         return datetime.fromtimestamp(
-            datetime.now().timestamp() + self._token_life_minutes*60
+            datetime.now().timestamp() + self._user_session_life_minutes*60
         )
 
 
-class CustomMinuteTokenFactory(MinuteTokenFactory):
-    def __init__(self, token_life_minutes: int | float, token_body_factory: Callable[[], str]):
-        self.token_life_minutes = token_life_minutes
-        self.token_body_factory = token_body_factory
+class CustomMinuteUserSessionFactory(MinuteUserSessionFactory):
+    def __init__(self, user_session_life_minutes: int | float, user_session_token_factory: Callable[[], str]):
+        self.user_session_life_minutes = user_session_life_minutes
+        self.user_session_token_factory = user_session_token_factory
 
     @property
-    def token_life_minutes(self) -> int | float:
-        return self._token_life_minutes
+    def user_session_life_minutes(self) -> int | float:
+        return self._user_session_life_minutes
 
-    @token_life_minutes.setter
-    def token_life_minutes(self, minutes: int | float) -> None:
-        self._token_life_minutes = minutes
+    @user_session_life_minutes.setter
+    def user_session_life_minutes(self, minutes: int | float) -> None:
+        self._user_session_life_minutes = minutes
 
-    def _create_token_body(self) -> str:
-        return self.token_body_factory()
+    def _create_user_session_token(self) -> str:
+        return self.user_session_token_factory()
 
 
 class UserAccessTokenFactory:

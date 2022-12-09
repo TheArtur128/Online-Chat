@@ -4,10 +4,10 @@ from functools import partial
 
 from dotenv import load_dotenv
 
-from models import Token
+from models import UserSession
 from services.factories import UserAccessTokenFactory, CustomMinuteUserSessionFactory
 from services.jwt_serializers import JWTSerializator
-from services.middlewares import ServiceErrorFormatterMiddleware
+
 
 load_dotenv()
 
@@ -27,19 +27,19 @@ if USER_DATABASE_PASSWORD is None:
 SQLALCHEMY_DATABASE_URI = f"postgresql://{DATABASE_USERNAME}:{USER_DATABASE_PASSWORD}@{DATABASE_PATH}/{DATABASE_NAME}"
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 
+
 ACCESS_TOKEN_LIFE_MINUTES = 15
 REFRESH_TOKEN_LIFE_DAYS = 30
 
 
-DEFAULT_JWT_SERIALIZATOR_FACTORY = CustomArgumentFactory(JWTSerializator, SECRET_KEY)
+DEFAULT_JWT_SERIALIZATOR_FACTORY = partial(JWTSerializator, SECRET_KEY)
 
 DEFAULT_ACCESS_TOKEN_FACTORY = UserAccessTokenFactory(
     DEFAULT_JWT_SERIALIZATOR_FACTORY(),
     ACCESS_TOKEN_LIFE_MINUTES
 )
 
-DEFAULT_REFRESH_TOKEN_FACTORY = CustomMinuteTokenFactory(
+DEFAULT_USER_SESSION_FACTORY = CustomMinuteUserSessionFactory(
     REFRESH_TOKEN_LIFE_DAYS*24*60,
     partial(token_hex, UserSession.token.comparator.type.length // 2)
 )
-

@@ -101,12 +101,12 @@ class UserRegistrarRouter(DBRouter, SchemaRouter):
     def __init__(
         self,
         database: SQLAlchemy,
-        user_refresh_token_factory: Callable[[], Token],
+        user_session_factory: Callable[[], Token],
         user_access_token_factory: Callable[[User], str]
     ):
         super().__init__(database)
 
-        self.user_refresh_token_factory = user_refresh_token_factory
+        self.user_session_factory = user_session_factory
         self.user_access_token_factory = user_access_token_factory
 
     def _get_cleaned_data_from(self, data: dict) -> dict:
@@ -125,14 +125,14 @@ class UserRegistrarRouter(DBRouter, SchemaRouter):
                 f"User with \"{data['url_token']}\" url token already exists"
             )
 
-        user_refresh_token = self.user_refresh_token_factory()
-        user = User(refresh_token=user_refresh_token, **data)
+        user_session = self.user_session_factory()
+        user = User(user_session=user_session, **data)
 
-        self.database.session.add(user_refresh_token)
+        self.database.session.add(user_session)
         self.database.session.add(user)
 
         return self._create_response_by(
-            user_refresh_token.body,
+            user_session.token,
             self.user_access_token_factory(user)
         )
 
