@@ -1,12 +1,13 @@
 from flask_restful import Resource
+from flask_middlewares import MiddlewareKeeper
 
 from models import db
 from config import DEFAULT_REFRESH_TOKEN_FACTORY, DEFAULT_ACCESS_TOKEN_FACTORY
 from services.routers import UserDataGetterRouter, UserRegistrarRouter
 
 
-class RoutResource(MiddlewareKeeper, Resource):
-    _internal_middlewares = (ServiceErrorFormatterMiddleware(), )
+class MiddlewareResource(MiddlewareKeeper, Resource, ABC):
+    _internal_middlewares: Iterable[Middleware]
 
     def __init__(self, *args, **kwargs):
         super().__init__()
