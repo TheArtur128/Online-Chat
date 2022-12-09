@@ -24,7 +24,7 @@ class MiddlewareResource(MiddlewareKeeper, Resource, ABC):
         super(Resource, self).__init__()
 
 
-class UserResource(RoutResource):
+class UserResource(Resource):
     get = UserDataGetterRouter()
     post = UserRegistrarRouter(
         db,
