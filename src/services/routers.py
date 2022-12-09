@@ -7,11 +7,16 @@ from flask import request, make_response, Response, jsonify
 from werkzeug.security import generate_password_hash
 
 from models import User, Token
-from services.abstractions.interfaces import IRouter
 from services.middlewares import MiddlewareKeeper, DBSessionFinisherMiddleware
 from services.schemes import FullUserSchema
 from services.errors import UserDoesntExistError, UserAlreadyExistsError
 from services.formatters import format_dict
+
+
+class IRouter(ABC):
+    @abstractmethod
+    def __call__(self, data: dict | Iterable) -> any:
+        pass
 
 
 class Router(IRouter, ABC):

@@ -3,7 +3,21 @@ from abc import ABC, abstractmethod
 from jwt import encode, decode
 from datetime import datetime
 
-from services.abstractions.interfaces import IJWTSerializator
+
+class IJWTCoder(ABC):
+    @abstractmethod
+    def encode(self, data: dict) -> str:
+        pass
+
+
+class IJWTDecoder(ABC):
+    @abstractmethod
+    def decode(self, token: str) -> dict:
+        pass
+
+
+class IJWTSerializator(IJWTCoder, IJWTDecoder, ABC):
+    pass
 
 
 class JWTSerializator(IJWTSerializator):
