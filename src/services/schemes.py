@@ -1,13 +1,8 @@
-from typing import Callable
-
-from marshmallow import Schema, fields, post_load, ValidationError, EXCLUDE, pre_dump
-from werkzeug.security import check_password_hash
+from marshmallow import Schema, fields, EXCLUDE
 
 from models import User
 from services.utils import create_length_validator_by_model_column, ASCIIRange
 from services.validators import CharactersValidator
-from services.formatters import format_dict, wrap_in_brackets
-from services.errors import UserNotFoundError, AuthenticationError, UserDoesntExistError
 
 
 class BaseUserSchema(Schema):
