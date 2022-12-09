@@ -16,5 +16,10 @@ db.init_app(app)
 
 migrate = Migrate(app, db)
 
+middleware_config = Config(str())
+middleware_config.from_object('middleware_config')
+
+MiddlewareAppRegistrar.create_from_config(middleware_config).init_app(app)
+
 if __name__ == '__main__':
     app.run(port='8048')
