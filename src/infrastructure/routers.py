@@ -96,6 +96,21 @@ class SchemaRouter(Router, ABC):
         return self._schema.dump(data)
 
 
+class ServiceRouter(Router, ABC):
+    _service: Callable
+    _is_service_input_multiple: bool = False
+
+    def _handle_cleaned_data(self, data: Iterable) -> any:
+        return (
+            tuple(map(self._call_service_by, data))
+            if self._is_service_input_multiple
+            else self._call_service_by(data)
+        )
+
+    def _call_service_by(self, data: Iterable) -> any:
+        return self._service(*data) if is_iterable_but_not_dict(data) else self._service(**data)
+
+
 
 
 class UserSchema(Schema):
