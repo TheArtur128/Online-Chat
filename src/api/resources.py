@@ -28,6 +28,6 @@ class UserResource(Resource):
     get = UserDataGetterRouter()
     post = UserRegistrarRouter(
         db,
-        DEFAULT_REFRESH_TOKEN_FACTORY,
+        DEFAULT_USER_SESSION_FACTORY,
         DEFAULT_ACCESS_TOKEN_FACTORY
     )
