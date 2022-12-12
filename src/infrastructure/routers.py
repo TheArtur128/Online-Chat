@@ -16,6 +16,14 @@ class IRouter(ABC):
         pass 
 
 
+class ProxyRouter(IRouter):
+    def __init__(self, router: IRouter):
+        self.router = router
+
+    def __call__(self, data: Iterable) -> any:
+        return self.router(data)
+
+
 class Router(IRouter, ABC):
     def __call__(self, data: Iterable) -> any:
         return self._handle_cleaned_data(self._get_cleaned_data_from(data))
