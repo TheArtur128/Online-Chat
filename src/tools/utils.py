@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import Iterable, Optional, Self, Callable
 
 from beautiful_repr import StylizedMixin, Field, TemplateFormatter
-from flask import Response
+from flask import Response, request
 from marshmallow.validate import Length
 
 from models import db
@@ -37,3 +37,7 @@ def get_time_after(minutes: int, is_time_raw: bool = False) -> datetime | float:
 
 def get_status_code_from_error(error: Exception, *, default_error_code: int = 500) -> int:
     return StatusCodeError.status_code if isinstance(error, StatusCodeError) else default_error_code
+
+
+def is_iterable_but_not_dict(data: any) -> bool:
+    return isinstance(data, Iterable) and not isinstance(data, dict) 
