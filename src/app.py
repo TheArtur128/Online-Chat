@@ -1,4 +1,5 @@
 from flask import Flask, Config
+from flask_middlewares import ProxyMiddlewareAppRegistrar
 from flask_migrate import Migrate
 
 from api import api_blueprint
@@ -19,7 +20,7 @@ migrate = Migrate(app, db)
 middleware_config = Config(str())
 middleware_config.from_object('middleware_config')
 
-MiddlewareAppRegistrar.create_from_config(middleware_config).init_app(app)
+ProxyMiddlewareAppRegistrar.create_from_config(middleware_config).init_app(app)
 
 if __name__ == '__main__':
     app.run(port='8048')
