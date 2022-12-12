@@ -1,52 +1,51 @@
 from abc import ABC, abstractmethod
-from typing import Callable, Iterable
+from typing import Callable, Iterable, Optional
 
-from marshmallow import Schema, ValidationError
+from marshmallow import Schema, ValidationError, fields
 from flask_sqlalchemy import SQLAlchemy
 from flask import request, make_response, Response, jsonify
 from werkzeug.security import generate_password_hash
 
-from models import User, Token
-from services.middlewares import MiddlewareKeeper, DBSessionFinisherMiddleware
-from services.schemes import FullUserSchema
-from services.errors import UserDoesntExistError, UserAlreadyExistsError
-from services.formatters import format_dict
+from infrastructure.errors import InputRouterDataCorrectionError
+from tools.utils import is_iterable_but_not_dict
 
 
 class IRouter(ABC):
     @abstractmethod
-    def __call__(self, data: dict | Iterable) -> any:
-        pass
+    def __call__(self, data: Iterable) -> any:
+        pass 
 
 
 class Router(IRouter, ABC):
-    def __call__(self) -> any:
-        return self._handle_cleaned_data(self._get_cleaned_data_from(request.json))
+    def __call__(self, data: Iterable) -> any:
+        return self._handle_cleaned_data(self._get_cleaned_data_from(data))
 
     @abstractmethod
-    def _get_cleaned_data_from(self, data: dict | Iterable) -> dict | Iterable:
+    def _get_cleaned_data_from(self, data: Iterable) -> Iterable:
         pass
 
     @abstractmethod
-    def _handle_cleaned_data(self, data: dict | Iterable) -> any:
+    def _handle_cleaned_data(self, data: Iterable) -> any:
         pass
-
-
-class MiddlewareRouter(MiddlewareKeeper, Router, ABC):
-    def __call__(self) -> any:
-        return self._proxy_middleware.call_route(super().__call__)
 
 
 class SchemaRouter(Router, ABC):
     _schema: Schema
 
-    def _get_cleaned_data_from(self, data: dict | Iterable) -> dict | Iterable:
+    def _get_cleaned_data_from(self, data: Iterable) -> Iterable:
         errors = self._schema.validate(data)
 
         if errors:
             raise ValidationError(errors)
 
         return self._schema.dump(data)
+
+
+
+
+class UserSchema(Schema):
+    name = fields.Str()
+    password = fields.Str()
 
 
 class UserDataGetterRouter(SchemaRouter):
