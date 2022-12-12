@@ -111,6 +111,19 @@ class ServiceRouter(Router, ABC):
         return self._service(*data) if is_iterable_but_not_dict(data) else self._service(**data)
 
 
+class ExternalRouter(ServiceRouter, SchemaRouter):
+    def __init__(self, *, is_service_input_multiple: bool = False):
+        self.is_service_input_multiple = is_service_input_multiple
+
+    @property
+    def is_service_input_multiple(self) -> bool:
+        return self._is_service_input_multiple
+
+    @is_service_input_multiple.setter
+    def is_service_input_multiple(self, is_service_input_multiple: bool) -> None:
+        self._is_service_input_multiple = self._schema.many = is_service_input_multiple
+
+
 
 
 class UserSchema(Schema):
