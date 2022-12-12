@@ -1,8 +1,8 @@
 from marshmallow import Schema, fields, EXCLUDE
 
 from models import User
-from services.utils import create_length_validator_by_model_column, ASCIIRange
-from services.validators import CharactersValidator
+from tools.utils import create_length_validator_by_model_column, ASCIIRange
+from tools.validators import CharactersValidator
 
 
 class BaseUserSchema(Schema):

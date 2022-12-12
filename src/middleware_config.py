@@ -3,9 +3,9 @@ from flask_middlewares.standard.status_code import AbortBadStatusCodeMiddleware,
 from flask_middlewares.standard.sql_alchemy import SQLAlchemySessionFinisherMiddleware
 
 from config import DEFAULT_JWT_SERIALIZATOR_FACTORY
+from infrastructure.middlewares import AccessTokenRequiredMiddleware
 from models import db
-from services.middlewares import AccessTokenRequiredMiddleware
-from services.utils import get_status_code_from_error
+from tools.utils import get_status_code_from_error
 
 
 GLOBAL_MIDDLEWARES = (

@@ -4,8 +4,8 @@ from flask import request
 from flask_middlewares import Middleware
 from jwt import InvalidTokenError
 
-from services.jwt_serializers import IJWTDecoder
-from services.errors import AccessTokenInvalidError
+from infrastructure.errors import AccessTokenInvalidError
+from tools.jwt_serializers import IJWTDecoder
 
 
 class AccessTokenRequiredMiddleware(Middleware):

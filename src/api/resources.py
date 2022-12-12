@@ -2,8 +2,8 @@ from flask_restful import Resource
 from flask_middlewares import MiddlewareKeeper
 
 from models import db
-from config import DEFAULT_REFRESH_TOKEN_FACTORY, DEFAULT_ACCESS_TOKEN_FACTORY
-from services.routers import UserDataGetterRouter, UserRegistrarRouter
+from config import DEFAULT_USER_SESSION_FACTORY, DEFAULT_ACCESS_TOKEN_FACTORY
+from infrastructure.routers import UserDataGetterRouter, UserRegistrarRouter
 
 
 class MiddlewareResource(MiddlewareKeeper, Resource, ABC):

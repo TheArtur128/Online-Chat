@@ -3,8 +3,8 @@ from datetime import datetime
 from typing import Callable, Iterable
 
 from models import UserSession, User
-from services.utils import get_time_after
-from services.jwt_serializers import IJWTCoder
+from tools.jwt_serializers import IJWTCoder
+from tools.utils import get_time_after
 
 
 class UserSessionFactory(ABC):
