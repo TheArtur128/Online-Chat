@@ -41,3 +41,7 @@ def get_status_code_from_error(error: Exception, *, default_error_code: int = 50
 
 def is_iterable_but_not_dict(data: any) -> bool:
     return isinstance(data, Iterable) and not isinstance(data, dict) 
+
+
+def get_json_data_from_request() -> dict | Iterable:
+    return request.json
