@@ -25,9 +25,11 @@ class MiddlewareResource(MiddlewareKeeper, Resource, ABC):
 
 
 class UserResource(Resource):
-    get = UserDataGetterRouter()
-    post = UserRegistrarRouter(
-        db,
-        DEFAULT_USER_SESSION_FACTORY,
-        DEFAULT_ACCESS_TOKEN_FACTORY
-    )
+    get = FlaskJSONRequestAdditionalProxyRouter(GetterRouter(
+        UserRepository(db),
+        FullUserSchema(many=True, exclude=('password', 'password_hash'))
+    ))
+    post = FlaskJSONRequestAdditionalProxyRouter(CustomExternalRouter(
+        UserRegistrar(UserRepository(db)),
+        FullUserSchema(many=True, exclude=('password', ))
+    ))
