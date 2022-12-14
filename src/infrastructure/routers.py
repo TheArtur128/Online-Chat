@@ -185,47 +185,5 @@ class GetterRouter(SchemaRouter):
         return filtered_user_data
 
 
-class UserRegistrarRouter(DBRouter, SchemaRouter):
-    _schema = FullUserSchema(many=False, exclude=('password_hash', ))
-
-    def __init__(
-        self,
-        database: SQLAlchemy,
-        user_session_factory: Callable[[], Token],
-        user_access_token_factory: Callable[[User], str]
-    ):
-        super().__init__(database)
-
-        self.user_session_factory = user_session_factory
-        self.user_access_token_factory = user_access_token_factory
-
-    def _handle_cleaned_data(self, data: dict) -> Response:
-        if User.query.filter_by(url_token=data['url_token']).first():
-            raise UserAlreadyExistsError(
-                f"User with \"{data['url_token']}\" url token already exists"
             )
 
-        user_session = self.user_session_factory()
-        user = User(user_session=user_session, **data)
-
-        self.database.session.add(user_session)
-        self.database.session.add(user)
-
-        return self._create_response_by(
-            user_session.token,
-            self.user_access_token_factory(user)
-        )
-
-    def _create_response_by(self, refresh_token: str, access_token: str) -> Response:
-        response = make_response(
-            jsonify({
-                'refresh_token': refresh_token,
-                'access_token': access_token
-            }),
-            201
-        )
-
-        response.set_cookie('refresh_token', refresh_token, httponly=True)
-        response.set_cookie('access_token', access_token, httponly=True)
-
-        return response
