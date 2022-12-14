@@ -23,5 +23,5 @@ MIDDLEWARES = (AbortBadStatusCodeMiddleware(), StatusCodeRedirectorMiddleware('v
 IS_GLOBAL_MIDDLEWARES_HIGHER = False
 
 MIDDLEWARE_ENVIRONMENTS = {
-    'api': dict()
+    'api': {'USE_FOR_BLUEPRINT': True}
 }
