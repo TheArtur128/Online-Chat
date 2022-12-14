@@ -38,10 +38,10 @@ class AdditionalDataProxyRouter(ProxyRouter, ABC):
         return super().__call__(
             self.additional_data
             if data is None
-            else self._get_combine_data_with(data)
+            else self._get_combine_additional_data_with(data)
         )
 
-    def _get_combine_data_with(self, data: Iterable) -> Iterable:
+    def _get_combine_additional_data_with(self, data: iterable) -> iterable:
         if (
             is_iterable_but_not_dict(data)
             and is_iterable_but_not_dict(self.additional_data)
@@ -50,14 +50,17 @@ class AdditionalDataProxyRouter(ProxyRouter, ABC):
         elif isinstance(data, dict) and isinstance(self.additional_data, dict):
             data = self.additional_data | data
         else:
-            raise InputRouterDataCorrectionError(self.__get_error_message_by(data))
+            raise InputRouterDataCorrectionError(
+                "Incompatible input data and additional data types",
+                dict(
+                    input_data_type=type(data).__name__,
+                    additional_data_type=type(self.additional_data).__name__
+                )
+            )
 
         return data
 
-    def __get_error_message_by(self, data: Iterable) -> str:
-        return "Incompatible input data{input_data_part} and additional data{additional_data_part}".format(
-            input_data_part=f" ({data})" if self.is_data_showing_in_error else str(),
-            additional_data_part=f" ({self.additional_data})" if self.is_data_showing_in_error else str()
+
         )
 
 
