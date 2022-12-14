@@ -6,6 +6,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask import request, make_response, Response, jsonify
 from werkzeug.security import generate_password_hash
 
+from infrastructure.services.repositories import IRepository
 from infrastructure.errors import InputRouterDataCorrectionError
 from tools.utils import is_iterable_but_not_dict
 
@@ -154,15 +155,19 @@ class CustomExternalRouter(ExternalRouter):
         super().__init__(is_service_input_multiple=is_service_input_multiple)
 
 
+class GetterRouter(SchemaRouter):
+    schema = DelegatingProperty('_schema')
 
-class UserDataGetterRouter(SchemaRouter):
-    _schema = FullUserSchema(many=True, exclude=('password', 'password_hash'))
+    def __init__(self, repository: IRepository, schema: Schema):
+        self.schema = schema
+        self.repository = repository
 
     def _handle_cleaned_data(self, data: Iterable[dict]) -> list[dict]:
-        filtered_user_data = list()
+        received_data = list()
+        non_existent_resource_data = list()
 
-        for user_data in data:
-            user = User.query.filter_by(**user_data).first()
+        for data_chunk in data:
+            resource = self.repository.get_by(**data_chunk)
             
             if not user:
                 raise UserDoesntExistError(
