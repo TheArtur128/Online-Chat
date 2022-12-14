@@ -1,9 +1,6 @@
 from datetime import datetime
 
-from flask_sqlalchemy import SQLAlchemy
-
-
-db = SQLAlchemy()
+from orm import db
 
 
 chat_member_table = db.Table(

@@ -3,7 +3,7 @@ from flask_middlewares import ProxyMiddlewareAppRegistrar
 from flask_migrate import Migrate
 
 from api import api_blueprint
-from models import db
+from orm import db
 from views import view_blueprint
 
 

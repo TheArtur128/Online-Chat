@@ -6,7 +6,7 @@ from beautiful_repr import StylizedMixin, Field, TemplateFormatter
 from flask import Response, request
 from marshmallow.validate import Length
 
-from models import db
+from orm import db
 
 
 def create_length_validator_by_model_column(model: db.Model, column: str) -> Length:
