@@ -24,25 +24,15 @@ class ProxyRouter(IRouter):
         return self.router(data)
 
 
-class AdditionalDataProxyRouter(ProxyRouter):
-    def __init__(
-        self, 
-        router: IRouter, 
-        additional_data_resource: Callable[[], Iterable] | Iterable,
-        *,
-        is_data_showing_in_error: bool = False
-    ):
+class AdditionalDataProxyRouter(ProxyRouter, ABC):
+    def __init__(self, router: IRouter, *, is_data_showing_in_error: bool = False):
         super().__init__(router)
-        self.additional_data_resource = additional_data_resource
-        self.is_data_showing_in_error = is_data_showing_in_error
+        self.is_data_showing_in_error
 
     @property
+    @abstractmethod
     def additional_data(self) -> Iterable:
-        return (
-            self.additional_data_resource()
-            if isinstance(self.additional_data_resource, Callable)
-            else self.additional_data_resource
-        )
+        pass
 
     def __call__(self, data: Optional[Iterable] = None) -> any:
         return super().__call__(
