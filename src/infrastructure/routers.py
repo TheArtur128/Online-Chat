@@ -169,21 +169,11 @@ class GetterRouter(SchemaRouter):
         for data_chunk in data:
             resource = self.repository.get_by(**data_chunk)
             
-            if not user:
-                raise UserDoesntExistError(
-                    "User with data ({user_data}) does not exist".format(
-                        user_data=format_dict(
-                            user_data,
-                            line_between_key_and_value='=',
-                            value_changer=lambda value: f'"{value}"'
-                        )
-                    )
-                )
-
-            filtered_user_data.append(self._schema.dump(user, many=False))
-
-        return filtered_user_data
-
-
+            (received_data if resource is not None else non_existent_resource_data).append(
+                self.schema.dump(resource, many=False)
             )
 
+        return {
+            'received': received_data,
+            'lost': non_existent_resource_data
+        }, (404 if non_existent_resource_data else 200)
