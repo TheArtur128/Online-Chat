@@ -104,10 +104,13 @@ class SchemaRouter(Router, ABC):
     _schema: Schema
 
     def _get_cleaned_data_from(self, data: Iterable) -> Iterable:
-        errors = self._schema.validate(data)
+        error_reports = self._schema.validate(data)
 
-        if errors:
-            raise ValidationError(errors)
+        if error_reports:
+            raise InputRouterDataCorrectionError(
+                "Incorect input router data",
+                error_reports
+            )
 
         return self._schema.dump(data)
 
