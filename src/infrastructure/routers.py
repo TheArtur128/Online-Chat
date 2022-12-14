@@ -136,11 +136,6 @@ class CustomExternalRouter(ExternalRouter):
 
 
 
-class UserSchema(Schema):
-    name = fields.Str()
-    password = fields.Str()
-
-
 class UserDataGetterRouter(SchemaRouter):
     _schema = FullUserSchema(many=True, exclude=('password', 'password_hash'))
 
