@@ -61,6 +61,23 @@ class AdditionalDataProxyRouter(ProxyRouter, ABC):
         return data
 
 
+class CustomAdditionalDataProxyRouter(AdditionalDataProxyRouter):
+    def __init__(
+        self, 
+        router: IRouter, 
+        additional_data_resource: Callable[[], Iterable | dict] | Iterable | dict,
+        *,
+        is_data_showing_in_error: bool = False
+    ):
+        super().__init__(router, is_data_showing_in_error)
+        self.additional_data_resource = additional_data_resource
+
+    @property
+    def additional_data(self) -> Iterable | dict:
+        return (
+            self.additional_data_resource()
+            if isinstance(self.additional_data_resource, Callable)
+            else self.additional_data_resource
         )
 
 
