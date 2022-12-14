@@ -1,6 +1,6 @@
 from marshmallow import Schema, fields, EXCLUDE, post_dump
 
-from models import User
+from orm.models import User
 from tools.utils import create_length_validator_by_model_column, ASCIIRange
 from tools.validators import CharactersValidator
 

@@ -2,8 +2,8 @@ from abc import ABC, abstractmethod
 from datetime import datetime
 from typing import Callable, Iterable
 
-from infrastructure.repositories import IRepository
 from infrastructure.errors import UserAlreadyExistsError
+from infrastructure.services.repositories import IRepository
 from orm.models import UserSession, User
 from tools.jwt_serializers import IJWTCoder
 from tools.utils import get_time_after
