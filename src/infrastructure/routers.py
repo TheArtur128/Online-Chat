@@ -81,6 +81,12 @@ class CustomAdditionalDataProxyRouter(AdditionalDataProxyRouter):
         )
 
 
+class FlaskJSONRequestAdditionalProxyRouter(AdditionalDataProxyRouter):
+    @property
+    def additional_data(self) -> Iterable | dict:
+        return request.json
+
+
 class Router(IRouter, ABC):
     def __call__(self, data: Iterable) -> any:
         return self._handle_cleaned_data(self._get_cleaned_data_from(data))
