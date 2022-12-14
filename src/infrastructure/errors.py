@@ -51,7 +51,7 @@ class ResorceError(RouterError):
     pass
 
 
-class UserNotFoundError(ResorceError, StatusCodeError):
+class RouterResourceNotFoundError(DocumentaryError, StatusCodeError, ResorceError):
     status_code = 404
 
 
