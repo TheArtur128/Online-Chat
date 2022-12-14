@@ -1,17 +1,15 @@
-from models import db, User
+from orm import db
+from orm.models import User
 
 
 class IRepository(ABC):
-    def add(self, instance: object) -> None:
+    def add(self, instance: db.Model) -> None:
         pass
 
-    def get(self, id: int) -> object:
+    def get_by(self, *, is_many: bool = False, **conditions) -> object | Iterable | None:
         pass
 
-    def filter_by(self, **conditions) -> object:
-        pass
-
-    def get_all(self) -> Iterable:
+    def delete(self, instance: db.Model) -> None:
         pass
 
 
@@ -24,7 +22,7 @@ class SQLAlchemyRepository(IRepository, ABC):
     def add(self, instance: db.Model) -> None:
         self._sqlalchemy_model.add(instance)
 
-    def get_by(self, *, is_many: bool = False, **conditions) -> object:
+    def get_by(self, *, is_many: bool = False, **conditions) -> object | Iterable | None:
         objects = self._sqlalchemy_model.query.filter_by(**conditions)
 
         return objects.all() if is_many else objects.one()
