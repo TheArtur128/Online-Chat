@@ -13,7 +13,7 @@ from tools.utils import is_iterable_but_not_dict
 class IRouter(ABC):
     @abstractmethod
     def __call__(self, data: Iterable) -> any:
-        pass 
+        pass
 
 
 class ProxyRouter(IRouter):
