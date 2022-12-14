@@ -1,14 +1,19 @@
+from abc import ABC, abstractmethod
+
 from orm import db
 from orm.models import User
 
 
 class IRepository(ABC):
+    @abstractmethod
     def add(self, instance: db.Model) -> None:
         pass
 
     def get_by(self, *, is_many: bool = False, **conditions) -> object | Iterable | None:
+    @abstractmethod
         pass
 
+    @abstractmethod
     def delete(self, instance: db.Model) -> None:
         pass
 
