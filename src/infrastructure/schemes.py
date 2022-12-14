@@ -1,4 +1,4 @@
-from marshmallow import Schema, fields, EXCLUDE
+from marshmallow import Schema, fields, EXCLUDE, post_dump
 
 from models import User
 from tools.utils import create_length_validator_by_model_column, ASCIIRange
@@ -52,3 +52,10 @@ class FullUserSchema(BaseUserSchema):
         allow_none=True,
         validate=[create_length_validator_by_model_column(User, 'description')]
     )
+
+    @post_dump
+    def previous_dump(self, data: object, **kwargs):
+        if 'name' not in data.keys() and 'url_token' in data.keys():
+            data['name'] = data['url_token']
+
+        return data

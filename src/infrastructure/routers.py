@@ -201,16 +201,6 @@ class UserRegistrarRouter(DBRouter, SchemaRouter):
         self.user_session_factory = user_session_factory
         self.user_access_token_factory = user_access_token_factory
 
-    def _get_cleaned_data_from(self, data: dict) -> dict:
-        data = super()._get_cleaned_data_from(data)
-
-        data['password_hash'] = generate_password_hash(data['password'])
-        del data['password']
-
-        data['name'] = data.get('name') or data.get('url_token')
-
-        return data
-
     def _handle_cleaned_data(self, data: dict) -> Response:
         if User.query.filter_by(url_token=data['url_token']).first():
             raise UserAlreadyExistsError(
