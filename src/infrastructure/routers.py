@@ -125,27 +125,15 @@ class ExternalRouter(ServiceRouter, SchemaRouter):
 
 
 class CustomExternalRouter(ExternalRouter):
+    service = DelegatingProperty('_service')
+    schema = DelegatingProperty('_schema')
+
     def __init__(self, service: Callable, schema: Schema, *, is_service_input_multiple: bool = False):
         self.service = service
         self.schema = schema
 
         super().__init__(is_service_input_multiple=is_service_input_multiple)
 
-    @property
-    def service(self) -> Callable:
-        return self._service
-
-    @service.setter
-    def service(self, service: Callable) -> None:
-        self._service = service
-
-    @property
-    def schema(self) -> Schema:
-        return self._schema
-
-    @schema.setter
-    def schema(self, schema: Schema) -> None:
-        self._schema = schema
 
 
 class UserSchema(Schema):

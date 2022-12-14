@@ -29,6 +29,26 @@ class ASCIIRange:
         )
 
 
+class DelegatingProperty:
+    def __init__(self, delegated_attribute_name: str, *, settable: bool = True):
+        self.delegated_attribute_name = delegated_attribute_name
+        self.settable = settable
+
+    def __get__(self, instance: object, owner: type) -> any:
+        return getattr(instance, self.delegated_attribute_name)
+
+    def __set__(self, instance: object, value: any) -> None:
+        if not self.settable:
+            raise AttributeError(
+                "delegating property of '{attribute_name}' for '{class_name}' object is not settable".format(
+                    attribute_name=self.delegated_attribute_name,
+                    class_name=type(instance).__name__
+                )
+            )
+
+        setattr(instance, self.delegated_attribute_name, value)
+
+
 def get_time_after(minutes: int, is_time_raw: bool = False) -> datetime | float:
     timestamp = datetime.today().timestamp() + minutes*60
 
