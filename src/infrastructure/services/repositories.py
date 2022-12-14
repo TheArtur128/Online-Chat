@@ -39,5 +39,19 @@ class SQLAlchemyRepository(IRepository, ABC):
         self._sqlalchemy_model.delete(instance)
 
 
+class CustomSQLAlchemyRepository(SQLAlchemyRepository):
+    def __init__(self, session: SQLAlchemy, sqlalchemy_model: db.Model):
+        super().__init__(session)
+        self.sqlalchemy_model = sqlalchemy_model
+
+    @property
+    def sqlalchemy_model(self) -> db.Model:
+        return self._sqlalchemy_model
+
+    @sqlalchemy_model.setter
+    def sqlalchemy_model(self, sqlalchemy_model: db.Model) -> None:
+        self._sqlalchemy_model = sqlalchemy_model
+
+
 class UserRepository(SQLAlchemyRepository):
     _sqlalchemy_model = User
