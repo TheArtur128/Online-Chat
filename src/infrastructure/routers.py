@@ -185,27 +185,6 @@ class GetterRouter(SchemaRouter):
         return filtered_user_data
 
 
-class DBRouter(MiddlewareRouter):
-    _db_session_middleware_factory: Callable[[SQLAlchemy], DBSessionFinisherMiddleware] = DBSessionFinisherMiddleware
-
-    _middleware_attribute_names = (
-        *MiddlewareRouter._middleware_attribute_names,
-        '_db_session_middleware'
-    )
-
-    def __init__(self, database: SQLAlchemy):
-        self._db_session_middleware = self._db_session_middleware_factory(database)
-        super().__init__()
-
-    @property
-    def database(self) -> SQLAlchemy:
-        return self._db_session_middleware.database
-
-    @database.setter
-    def database(self, database: SQLAlchemy) -> None:
-        self._db_session_middleware.database = database
-
-
 class UserRegistrarRouter(DBRouter, SchemaRouter):
     _schema = FullUserSchema(many=False, exclude=('password_hash', ))
 
