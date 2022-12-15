@@ -75,6 +75,26 @@ class _RepositoryAnnotation:
         )
 
 
+class Repository(IRepository, ABC):
+    _annotation_factory: Callable[[type, Iterable[type]], type] = _RepositoryAnnotation
+
+    @property
+    @abstractmethod
+    def supported_storage_types(self) -> Iterable[type]:
+        pass
+
+    @classmethod
+    def __class_getitem__(cls, supported_type_resource: type | Iterable[type]) -> type:
+        return cls._annotation_factory(
+            cls,
+            (
+                supported_type_resource
+                if isinstance(supported_type_resource, Iterable)
+                else (supported_type_resource, )
+            )
+        )
+
+
 class SQLAlchemyRepository(Repository, ABC):
     _sqlalchemy_model: db.Model
 
