@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Iterable
+from typing import Optional, Iterable, Union, Callable
 
 from flask_sqlalchemy import SQLAlchemy
 
@@ -17,7 +17,7 @@ class IRepository(ABC):
         pass
 
     @abstractmethod
-    def get_by(self, *, is_many: bool = False, **conditions) -> object | Iterable | None:
+    def get_by(self, *, is_many: bool = False, **conditions) -> Optional[object | Iterable]:
         pass
 
     @abstractmethod
