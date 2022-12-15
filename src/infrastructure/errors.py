@@ -32,11 +32,11 @@ class StatusCodeError(InfrastructureError, ABC):
 
 
 class AuthenticationError(StatusCodeError):
-    status_code = 403
+    status_code = 401
 
 
 class AuthorizationError(StatusCodeError):
-    status_code = 401
+    status_code = 403
 
 
 class RouterError(InfrastructureError):
