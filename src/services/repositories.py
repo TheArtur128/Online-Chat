@@ -101,6 +101,10 @@ class SQLAlchemyRepository(Repository, ABC):
     def __init__(self, session: SQLAlchemy):
         self.session = session
 
+    @property
+    def supported_storage_types(self) -> tuple[db.Model]:
+        return (self._sqlalchemy_model, )
+
     def add(self, instance: db.Model) -> None:
         self._sqlalchemy_model.add(instance)
 
