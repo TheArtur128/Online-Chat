@@ -6,8 +6,8 @@ from flask_sqlalchemy import SQLAlchemy
 from flask import request, make_response, Response, jsonify
 from werkzeug.security import generate_password_hash
 
-from infrastructure.services.repositories import IRepository
 from infrastructure.errors import InputRouterDataCorrectionError
+from services.repositories import IRepository
 from tools.utils import is_iterable_but_not_dict
 
 
