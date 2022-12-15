@@ -9,6 +9,10 @@ from orm.models import User
 
 class IRepository(ABC):
     @abstractmethod
+    def __contains__(self, instance: object) -> bool:
+        pass
+
+    @abstractmethod
     def add(self, instance: object) -> None:
         pass
 
