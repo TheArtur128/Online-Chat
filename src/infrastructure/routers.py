@@ -169,8 +169,8 @@ class GetterController(SchemaController):
     schema = DelegatingProperty('_schema')
 
     def __init__(self, repository: IRepository, schema: Schema):
-        self.schema = schema
         self.repository = repository
+        self.schema = schema
 
     def _handle_cleaned_data(self, data: Iterable[dict]) -> ControllerResponse:
         received_data = list()
