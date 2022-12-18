@@ -1,9 +1,14 @@
-from flask_restful import Resource
-from flask_middlewares import MiddlewareKeeper
+from abc import ABC
+from typing import Iterable
 
-from models import db
+from flask_restful import Resource
+from flask_middlewares import MiddlewareKeeper, Middleware
+
 from config import DEFAULT_USER_SESSION_FACTORY, DEFAULT_ACCESS_TOKEN_FACTORY
-from infrastructure.routers import UserDataGetterRouter, UserRegistrarRouter
+from infrastructure.routers import FlaskJSONRequestAdditionalProxyController, GetterController
+from services.account import AccountRegistrar
+from services.repositories import UserRepository
+from orm import db
 
 
 class MiddlewareResource(MiddlewareKeeper, Resource, ABC):

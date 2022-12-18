@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Iterable, Optional, Self, Callable
+from typing import Iterable, Optional
 
 from beautiful_repr import StylizedMixin, Field, TemplateFormatter
 from flask import Response, request

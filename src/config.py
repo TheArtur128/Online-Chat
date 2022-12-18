@@ -5,7 +5,7 @@ from functools import partial
 from dotenv import load_dotenv
 
 from orm.models import UserSession
-from infrastructure.services.factories import UserAccessTokenFactory, CustomMinuteUserSessionFactory
+from services.factories import UserAccessTokenFactory, CustomMinuteUserSessionFactory
 from tools.jwt_serializers import JWTSerializator
 
 

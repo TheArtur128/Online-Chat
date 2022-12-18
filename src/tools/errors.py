@@ -1,3 +1,7 @@
+from abc import ABC
+from typing import Optional
+
+
 class ToolError(Exception):
     pass
 
