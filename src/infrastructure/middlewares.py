@@ -5,6 +5,7 @@ from flask_middlewares import Middleware
 from flask_middlewares.standard.error_handling import JSONResponseErrorFormatter, TypeErrorHandler
 from jwt import InvalidTokenError
 
+from infrastructure.controllers import ControllerResponse
 from infrastructure.errors import AccessTokenInvalidError, DocumentaryError
 from tools.jwt_serializers import IJWTDecoder
 from tools.utils import get_status_code_from_error
@@ -57,4 +58,5 @@ class ControllerResponseFormatterMiddleware(Middleware):
             if isinstance(result, ControllerResponse)
             else result
         )
+
 

@@ -5,7 +5,7 @@ from flask_restful import Resource
 from flask_middlewares import MiddlewareKeeper, Middleware
 
 from config import DEFAULT_USER_SESSION_FACTORY, DEFAULT_ACCESS_TOKEN_FACTORY
-from infrastructure.routers import FlaskJSONRequestAdditionalProxyController, GetterController
+from infrastructure.controllers import FlaskJSONRequestAdditionalProxyController, GetterController, CustomExternalController
 from services.account import AccountRegistrar
 from services.repositories import UserRepository
 from orm import db

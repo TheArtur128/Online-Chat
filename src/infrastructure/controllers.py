@@ -36,7 +36,7 @@ class ProxyController(IController):
 class AdditionalDataProxyController(ProxyController, ABC):
     def __init__(self, controller: IController, *, is_data_showing_in_error: bool = False):
         super().__init__(controller)
-        self.is_data_showing_in_error
+        self.is_data_showing_in_error = is_data_showing_in_error
 
     @property
     @abstractmethod
