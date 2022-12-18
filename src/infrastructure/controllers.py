@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Callable, Iterable, Optional
 
 from marshmallow import Schema, ValidationError, fields
@@ -15,8 +15,8 @@ from tools.utils import is_iterable_but_not_dict, DelegatingProperty
 @dataclass(frozen=True)
 class ControllerResponse:
     payload: any
-    status_code: int
-    metadata: dict
+    status_code: int = 200
+    metadata: dict = field(default_factory=dict)
 
 
 class IController(ABC):
