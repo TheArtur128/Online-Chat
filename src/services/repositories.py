@@ -88,6 +88,9 @@ class Repository(IRepository, ABC):
     def supported_storage_types(self) -> Iterable[type]:
         pass
 
+    def __iter__(self) -> iter:
+        return iter(self.all())
+
     @classmethod
     def __class_getitem__(cls, supported_type_resource: type | Iterable[type]) -> type:
         return cls._annotation_factory(
