@@ -7,13 +7,13 @@ from jwt import InvalidTokenError
 
 from infrastructure.controllers import ControllerResponse
 from infrastructure.errors import AccessTokenInvalidError, DocumentaryError
-from tools.jwt_serializers import IJWTDecoder
+from services.serializers import IDecoder
 from tools.utils import get_status_code_from_error
 
 
 class AccessTokenRequiredMiddleware(Middleware):
-    def __init__(self, jwt_decoder: IJWTDecoder, access_token_getter: Callable[[], Optional[str]]):
-        self.jwt_decoder = jwt_decoder
+    def __init__(self, token_decoder: IDecoder, access_token_getter: Callable[[], Optional[str]]):
+        self.token_decoder = token_decoder
         self.access_token_getter = access_token_getter
 
     def call_route(self, route: Callable, *args, **kwargs) -> any:
@@ -23,7 +23,7 @@ class AccessTokenRequiredMiddleware(Middleware):
             raise AccessTokenInvalidError("Access token is missing")
 
         try:
-            self.jwt_decoder.decode(access_token)
+            self.token_decoder.decode(access_token)
         except InvalidTokenError:
             raise AccessTokenInvalidError("Access token is invalid")
 

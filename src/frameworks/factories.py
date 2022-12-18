@@ -3,8 +3,6 @@ from datetime import datetime
 from typing import Callable
 
 from orm.models import UserSession, User
-from tools.jwt_serializers import IJWTCoder
-from tools.utils import get_time_after
 
 
 class UserSessionFactory(ABC):
@@ -49,15 +47,3 @@ class CustomMinuteUserSessionFactory(MinuteUserSessionFactory):
 
     def _create_user_session_token(self) -> str:
         return self.user_session_token_factory()
-
-
-class UserAccessTokenFactory:
-    def __init__(self, jwt_coder: IJWTCoder, life_minutes: int | float):
-        self.jwt_coder = jwt_coder
-        self.life_minutes = life_minutes
-
-    def __call__(self, user: User) -> str:
-        return self.jwt_coder.encode({
-            'url_token': user.url_token,
-            'exp': get_time_after(self.life_minutes, is_time_raw=True)
-        })

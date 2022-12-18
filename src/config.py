@@ -4,9 +4,10 @@ from functools import partial
 
 from dotenv import load_dotenv
 
+from frameworks.factories import CustomMinuteUserSessionFactory
+from frameworks.jwt_serializers import JWTSerializator
+from services.account import AccountAccessTokenFactory
 from orm.models import UserSession
-from services.factories import UserAccessTokenFactory, CustomMinuteUserSessionFactory
-from tools.jwt_serializers import JWTSerializator
 
 
 load_dotenv()
@@ -34,7 +35,7 @@ REFRESH_TOKEN_LIFE_DAYS = 30
 
 DEFAULT_JWT_SERIALIZATOR_FACTORY = partial(JWTSerializator, SECRET_KEY)
 
-DEFAULT_ACCESS_TOKEN_FACTORY = UserAccessTokenFactory(
+DEFAULT_ACCESS_TOKEN_FACTORY = AccountAccessTokenFactory(
     DEFAULT_JWT_SERIALIZATOR_FACTORY(),
     ACCESS_TOKEN_LIFE_MINUTES
 )

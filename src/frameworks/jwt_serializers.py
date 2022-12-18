@@ -1,26 +1,10 @@
-from abc import ABC, abstractmethod
+from services.serializers import ISerializator
 
 from jwt import encode, decode
 from datetime import datetime
 
 
-class IJWTCoder(ABC):
-    @abstractmethod
-    def encode(self, data: dict) -> str:
-        pass
-
-
-class IJWTDecoder(ABC):
-    @abstractmethod
-    def decode(self, token: str) -> dict:
-        pass
-
-
-class IJWTSerializator(IJWTCoder, IJWTDecoder, ABC):
-    pass
-
-
-class JWTSerializator(IJWTSerializator):
+class JWTSerializator(ISerializator):
     def __init__(self, key: str, is_symmetric: bool = True, leeway: int | float = 0):
         self.key = key
         self.is_symmetric = is_symmetric

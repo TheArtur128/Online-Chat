@@ -3,10 +3,18 @@ from flask_middlewares.standard.status_code import AbortBadStatusCodeMiddleware,
 from flask_middlewares.standard.sql_alchemy import SQLAlchemySessionFinisherMiddleware
 
 from config import DEFAULT_JWT_SERIALIZATOR_FACTORY
+from frameworks.flask import FlaskAccessTokenGetter, get_flask_response_by_controller_response
 from infrastructure.middlewares import AccessTokenRequiredMiddleware, DocumentaryErrorJSONResponseFormatter, ControllerResponseFormatterMiddleware
 from orm import db
-from tools.utils import get_status_code_from_error, FlaskAccessTokenGetter, get_flask_response_by_controller_response
+from tools.utils import get_status_code_from_error
 
+
+IS_GLOBAL_MIDDLEWARES_HIGHER = False
+
+MIDDLEWARES = (
+    AbortBadStatusCodeMiddleware(),
+    StatusCodeRedirectorMiddleware('views.login')
+)
 
 GLOBAL_MIDDLEWARES = (
     ControllerResponseFormatterMiddleware(get_flask_response_by_controller_response),
@@ -24,10 +32,6 @@ GLOBAL_MIDDLEWARES = (
         FlaskAccessTokenGetter('access-token')
     )
 )
-
-MIDDLEWARES = (AbortBadStatusCodeMiddleware(), StatusCodeRedirectorMiddleware('views.login'))
-
-IS_GLOBAL_MIDDLEWARES_HIGHER = False
 
 MIDDLEWARE_ENVIRONMENTS = {
     'api': {'USE_FOR_BLUEPRINT': True}

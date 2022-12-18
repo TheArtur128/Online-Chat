@@ -1,14 +1,11 @@
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Iterable, Optional
-from json import dumps
+from typing import Iterable
 
 from beautiful_repr import StylizedMixin, Field, TemplateFormatter
-from flask import Response, request
 from marshmallow.validate import Length
 
 from orm import db
-from infrastructure.controllers import ControllerResponse
 
 
 def create_length_validator_by_model_column(model: db.Model, column: str) -> Length:
@@ -51,14 +48,6 @@ class DelegatingProperty:
         setattr(instance, self.delegated_attribute_name, value)
 
 
-class FlaskAccessTokenGetter:
-    def __init__(self, token_key_name: str):
-        self.token_key_name = token_key_name
-
-    def __call__(self) -> Optional[str]:
-        return request.cookies.get(self.token_key_name) or request.headers.get(self.token_key_name)
-
-
 def get_time_after(minutes: int, is_time_raw: bool = False) -> datetime | float:
     timestamp = datetime.today().timestamp() + minutes*60
 
@@ -70,30 +59,4 @@ def get_status_code_from_error(error: Exception, *, default_error_code: int = 50
 
 
 def is_iterable_but_not_dict(data: any) -> bool:
-    return isinstance(data, Iterable) and not isinstance(data, dict) 
-
-
-def get_json_data_from_request() -> dict | Iterable:
-    return request.json
-
-
-def get_flask_response_by_controller_response(controller_response: ControllerResponse) -> Response:
-    headers = dict(controller_response.metadata)
-
-    is_payload_json_like = (
-        isinstance(controller_response.payload, Iterable)
-        and any(not isinstance(item, str) for item in controller_response.payload)
-    )
-
-    if is_payload_json_like:
-        headers['Content-Type'] = 'application/json'
-
-    return Response(
-        response=(
-            dumps(controller_response.payload)
-            if is_payload_json_like
-            else controller_response.payload
-        ),
-        status=controller_response.status_code,
-        headers=headers
-    )
+    return isinstance(data, Iterable) and not isinstance(data, dict)

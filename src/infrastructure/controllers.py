@@ -90,12 +90,6 @@ class CustomAdditionalDataProxyController(AdditionalDataProxyController):
         )
 
 
-class FlaskJSONRequestAdditionalProxyController(AdditionalDataProxyController):
-    @property
-    def additional_data(self) -> Iterable | dict:
-        return request.json
-
-
 class Controller(IController, ABC):
     def __call__(self, data: Iterable) -> ControllerResponse:
         response = self._handle_cleaned_data(self._get_cleaned_data_from(data))

@@ -6,7 +6,6 @@ from api import api_blueprint
 from orm import db
 from views import view_blueprint
 
-
 app = Flask(__name__)
 app.config.from_object('config')
 
