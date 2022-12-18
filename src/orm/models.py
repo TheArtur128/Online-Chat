@@ -52,7 +52,7 @@ class User(db.Model, _FormattedUrlModelMixin):
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True)
-    session_id = db.Column(db.Integer, db.ForeignKey(UserSession.id), unique=True, nullable=False)
+    session_id = db.Column(db.Integer, db.ForeignKey(UserSession.id), unique=True)
     url_token = db.Column(db.String(32), nullable=False, unique=True)
     password_hash = db.Column(db.String(1024), nullable=False)
     name = db.Column(db.String(64), nullable=False)
