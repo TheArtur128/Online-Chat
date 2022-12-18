@@ -48,7 +48,7 @@ class UserSession(db.Model):
         return datetime.now() < self.cancellation_time
 
 
-class User(db.Model, _FormattedUrlModelMixin):
+class User(_FormattedUrlModelMixin, db.Model):
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -63,7 +63,7 @@ class User(db.Model, _FormattedUrlModelMixin):
     chats = db.relationship('Chat', secondary=chat_member_table, back_populates='members')
 
 
-class Chat(db.Model, _FormattedUrlModelMixin):
+class Chat(_FormattedUrlModelMixin, db.Model):
     __tablename__ = 'chats'
 
     id = db.Column(db.Integer, primary_key=True)
