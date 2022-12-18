@@ -6,6 +6,7 @@ from flask_middlewares import MiddlewareKeeper, Middleware
 
 from config import DEFAULT_USER_SESSION_FACTORY, DEFAULT_ACCESS_TOKEN_FACTORY
 from infrastructure.controllers import FlaskJSONRequestAdditionalProxyController, GetterController, CustomExternalController
+from infrastructure.schemes import UserSchema
 from services.account import AccountRegistrar
 from services.repositories import UserRepository
 from orm import db
