@@ -12,6 +12,9 @@ class IRepository(ABC):
     @abstractmethod
     def __iter__(self) -> iter:
         pass
+
+    @abstractmethod
+    def all(self) -> Iterable:
         pass
 
     @abstractmethod
