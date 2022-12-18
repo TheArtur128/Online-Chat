@@ -49,6 +49,14 @@ class DelegatingProperty:
         setattr(instance, self.delegated_attribute_name, value)
 
 
+class FlaskAccessTokenGetter:
+    def __init__(self, token_key_name: str):
+        self.token_key_name = token_key_name
+
+    def __call__(self) -> Optional[str]:
+        return request.cookies.get(self.token_key_name) or request.headers.get(self.token_key_name)
+
+
 def get_time_after(minutes: int, is_time_raw: bool = False) -> datetime | float:
     timestamp = datetime.today().timestamp() + minutes*60
 
