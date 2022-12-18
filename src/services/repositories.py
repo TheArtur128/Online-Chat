@@ -32,6 +32,11 @@ class Equal(ValueAnnotation):
     pass
 
 
+@dataclass(frozen=True)
+class Not(ValueAnnotation):
+    pass
+
+
 class GroupingAnnotation(SearchAnnotation):
     def __init__(self, *annotations: SearchAnnotation):
         self.annotations = annotations
