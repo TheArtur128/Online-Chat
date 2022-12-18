@@ -3,7 +3,8 @@ from dataclasses import dataclass
 from typing import Optional, Iterable, Union, Callable
 
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.sql.expression import BinaryExpression, and_, or_
+from sqlalchemy.orm.attributes import InstrumentedAttribute
+from sqlalchemy.sql.expression import BinaryExpression, and_, or_, not_
 from orm import db
 from orm.models import User
 
@@ -215,6 +216,10 @@ class SQLAlchemyRepository(Repository, ABC):
 
         return objects.all() if is_many else objects.first()
 
+    __sqlalchemy_grouper_by_annotation_type: dict[SearchAnnotation, Callable] = {
+        And: and_, Or: or_, Not: not_
+    }
+
     def __get_sqlalchemy_conditions_by(
         self,
         conditions: Iterable[SearchAnnotation | object],
@@ -228,11 +233,15 @@ class SQLAlchemyRepository(Repository, ABC):
                 sqlalchemy_conditions.append(model_attribute > condition.value)
             elif isinstance(condition, Lesser):
                 sqlalchemy_conditions.append(model_attribute < condition.value)
-            elif isinstance(condition, GroupingAnnotation):
+            elif isinstance(condition, GroupingAnnotation) or isinstance(condition, Not):
                 sqlalchemy_conditions.append(
-                    (or_ if isinstance(condition, Or) else and_)(
+                    self.__sqlalchemy_grouper_by_annotation_type[type(condition)](
                         *self.__get_sqlalchemy_conditions_by(
-                            condition.annotations,
+                            (
+                                condition.annotations
+                                if isinstance(condition, GroupingAnnotation)
+                                else (condition.value, )
+                            ),
                             attribute_name
                         )
                     )
