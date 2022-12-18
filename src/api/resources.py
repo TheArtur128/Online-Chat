@@ -30,11 +30,11 @@ class MiddlewareResource(MiddlewareKeeper, Resource, ABC):
 
 
 class UserResource(Resource):
-    get = FlaskJSONRequestAdditionalProxyRouter(GetterRouter(
+    get = FlaskJSONRequestAdditionalProxyController(GetterController(
         UserRepository(db),
         UserSchema(many=True, exclude=('password', 'password_hash'))
     ))
-    post = FlaskJSONRequestAdditionalProxyRouter(CustomExternalRouter(
-        UserRegistrar(UserRepository(db)),
+    post = FlaskJSONRequestAdditionalProxyController(CustomExternalController(
+        AccountRegistrar(UserRepository(db)),
         UserSchema(many=True, exclude=('password', ))
     ))

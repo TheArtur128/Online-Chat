@@ -16,19 +16,18 @@ class AuthorizationError(StatusCodeError):
     status_code = 403
 
 
-class RouterError(InfrastructureError):
+class ControllerError(InfrastructureError):
     pass
 
 
-class InputRouterDataCorrectionError(DocumentaryError, StatusCodeError, RouterError):
+class InputControllerDataCorrectionError(DocumentaryError, StatusCodeError, ControllerError):
     status_code = 400
 
 
-class ResorceError(RouterError):
     pass
 
 
-class RouterResourceNotFoundError(DocumentaryError, StatusCodeError, ResorceError):
+class ControllerResourceNotFoundError(DocumentaryError, StatusCodeError, ResorceError):
     status_code = 404
 
 

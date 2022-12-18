@@ -6,9 +6,9 @@ from flask_sqlalchemy import SQLAlchemy
 from flask import request, make_response, Response, jsonify
 from werkzeug.security import generate_password_hash
 
-from infrastructure.errors import InputRouterDataCorrectionError
+from infrastructure.errors import InputControllerDataCorrectionError
 from services.repositories import IRepository
-from tools.utils import is_iterable_but_not_dict
+from tools.utils import is_iterable_but_not_dict, DelegatingProperty
 
 
 class IRouter(ABC):
@@ -17,17 +17,17 @@ class IRouter(ABC):
         pass
 
 
-class ProxyRouter(IRouter):
-    def __init__(self, router: IRouter):
-        self.router = router
+class ProxyController(IController):
+    def __init__(self, controller: IController):
+        self.controller = controller
 
-    def __call__(self, data: Iterable) -> any:
-        return self.router(data)
+    def __call__(self, data: Iterable) -> ControllerResponse:
+        return self.controller(data)
 
 
-class AdditionalDataProxyRouter(ProxyRouter, ABC):
-    def __init__(self, router: IRouter, *, is_data_showing_in_error: bool = False):
-        super().__init__(router)
+class AdditionalDataProxyController(ProxyController, ABC):
+    def __init__(self, controller: IController, *, is_data_showing_in_error: bool = False):
+        super().__init__(controller)
         self.is_data_showing_in_error
 
     @property
@@ -51,7 +51,7 @@ class AdditionalDataProxyRouter(ProxyRouter, ABC):
         elif isinstance(data, dict) and isinstance(self.additional_data, dict):
             data = self.additional_data | data
         else:
-            raise InputRouterDataCorrectionError(
+            raise InputControllerDataCorrectionError(
                 "Incompatible input data and additional data types",
                 dict(
                     input_data_type=type(data).__name__,
@@ -62,15 +62,15 @@ class AdditionalDataProxyRouter(ProxyRouter, ABC):
         return data
 
 
-class CustomAdditionalDataProxyRouter(AdditionalDataProxyRouter):
+class CustomAdditionalDataProxyController(AdditionalDataProxyController):
     def __init__(
         self, 
-        router: IRouter, 
+        controller: IController, 
         additional_data_resource: Callable[[], Iterable | dict] | Iterable | dict,
         *,
         is_data_showing_in_error: bool = False
     ):
-        super().__init__(router, is_data_showing_in_error)
+        super().__init__(controller, is_data_showing_in_error)
         self.additional_data_resource = additional_data_resource
 
     @property
@@ -82,41 +82,39 @@ class CustomAdditionalDataProxyRouter(AdditionalDataProxyRouter):
         )
 
 
-class FlaskJSONRequestAdditionalProxyRouter(AdditionalDataProxyRouter):
+class FlaskJSONRequestAdditionalProxyController(AdditionalDataProxyController):
     @property
     def additional_data(self) -> Iterable | dict:
         return request.json
 
 
-class Router(IRouter, ABC):
-    def __call__(self, data: Iterable) -> any:
-        return self._handle_cleaned_data(self._get_cleaned_data_from(data))
+class Controller(IController, ABC):
 
     @abstractmethod
     def _get_cleaned_data_from(self, data: Iterable) -> Iterable:
         pass
 
     @abstractmethod
-    def _handle_cleaned_data(self, data: Iterable) -> any:
+    def _handle_cleaned_data(self, data: Iterable) -> ControllerResponse | object:
         pass
 
 
-class SchemaRouter(Router, ABC):
+class SchemaController(Controller, ABC):
     _schema: Schema
 
     def _get_cleaned_data_from(self, data: Iterable) -> Iterable:
         error_reports = self._schema.validate(data)
 
         if error_reports:
-            raise InputRouterDataCorrectionError(
-                "Incorect input router data",
+            raise InputControllerDataCorrectionError(
+                "Incorect input controller data",
                 error_reports
             )
 
         return self._schema.dump(data)
 
 
-class ServiceRouter(Router, ABC):
+class ServiceController(Controller, ABC):
     _service: Callable
     _is_service_input_multiple: bool = False
 
@@ -131,7 +129,7 @@ class ServiceRouter(Router, ABC):
         return self._service(*data) if is_iterable_but_not_dict(data) else self._service(**data)
 
 
-class ExternalRouter(ServiceRouter, SchemaRouter):
+class ExternalController(ServiceController, SchemaController, ABC):
     def __init__(self, *, is_service_input_multiple: bool = False):
         self.is_service_input_multiple = is_service_input_multiple
 
@@ -144,7 +142,7 @@ class ExternalRouter(ServiceRouter, SchemaRouter):
         self._is_service_input_multiple = self._schema.many = is_service_input_multiple
 
 
-class CustomExternalRouter(ExternalRouter):
+class CustomExternalController(ExternalController):
     service = DelegatingProperty('_service')
     schema = DelegatingProperty('_schema')
 
@@ -155,7 +153,7 @@ class CustomExternalRouter(ExternalRouter):
         super().__init__(is_service_input_multiple=is_service_input_multiple)
 
 
-class GetterRouter(SchemaRouter):
+class GetterController(SchemaController):
     schema = DelegatingProperty('_schema')
 
     def __init__(self, repository: IRepository, schema: Schema):
