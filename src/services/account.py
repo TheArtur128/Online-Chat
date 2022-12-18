@@ -1,16 +1,21 @@
-from infrastructure.services.repositories import IRepository
-from infrastructure.errors import UserAlreadyExistsError
-from orm.models import User
+from abc import ABC
+
+from services.errors import AccountAlreadyExistsError
+from services.repositories import Repository
 
 
-class UserRegistrar:
-    def __init__(self, user_repository: IRepository):
-        self.user_repository = user_repository
+class Account(ABC):
+    url_token: str
 
-    def __call__(self, user: User) -> None:
-        if self.user_repository.get_by(url_token=user.url_token) is not None:
-            raise UserAlreadyExistsError(
-                f"User with \"{user.url_token}\" url token already exists"
+
+class AccountRegistrar:
+    def __init__(self, account_repository: Repository[Account]):
+        self.account_repository = account_repository
+
+    def __call__(self, account: Account) -> None:
+        if self.account_repository.get_by(url_token=account.url_token) is not None:
+            raise AccountAlreadyExistsError(
+                f"Account with \"{account.url_token}\" url token already exists"
             )
 
-        self.user_repository.add(user)
+        self.account_repository.add(account)

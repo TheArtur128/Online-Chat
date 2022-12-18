@@ -1,5 +1,14 @@
-from infrastructure.errors import InfrastructureError
+class ServiceError(Exception):
+    pass
 
 
-class ServiceInfrastructureError(InfrastructureError):
+class AccountServiceError(ServiceError):
+    pass
+
+
+class AccountRegistrarError(AccountServiceError):
+    pass
+
+
+class AccountAlreadyExistsError(AccountRegistrarError):
     pass
