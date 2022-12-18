@@ -3,12 +3,13 @@ from flask_middlewares.standard.status_code import AbortBadStatusCodeMiddleware,
 from flask_middlewares.standard.sql_alchemy import SQLAlchemySessionFinisherMiddleware
 
 from config import DEFAULT_JWT_SERIALIZATOR_FACTORY
-from infrastructure.middlewares import AccessTokenRequiredMiddleware, DocumentaryErrorJSONResponseFormatter
+from infrastructure.middlewares import AccessTokenRequiredMiddleware, DocumentaryErrorJSONResponseFormatter, ControllerResponseFormatterMiddleware
 from orm import db
-from tools.utils import get_status_code_from_error, FlaskAccessTokenGetter
+from tools.utils import get_status_code_from_error, FlaskAccessTokenGetter, get_flask_response_by_controller_response
 
 
 GLOBAL_MIDDLEWARES = (
+    ControllerResponseFormatterMiddleware(get_flask_response_by_controller_response),
     CustomHandlerErrorMiddleware((
         DocumentaryErrorJSONResponseFormatter(),
         CustomJSONResponseErrorFormatter(
