@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 from typing import Optional, Iterable, Union, Callable
 
 from flask_sqlalchemy import SQLAlchemy
@@ -9,7 +10,8 @@ from orm.models import User
 
 class IRepository(ABC):
     @abstractmethod
-    def __contains__(self, instance: object) -> bool:
+    def __iter__(self) -> iter:
+        pass
         pass
 
     @abstractmethod
