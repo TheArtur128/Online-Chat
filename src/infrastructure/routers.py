@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 from typing import Callable, Iterable, Optional
 
 from marshmallow import Schema, ValidationError, fields
@@ -11,9 +12,16 @@ from services.repositories import IRepository
 from tools.utils import is_iterable_but_not_dict, DelegatingProperty
 
 
-class IRouter(ABC):
+@dataclass(frozen=True)
+class ControllerResponse:
+    payload: any
+    status_code: int
+    metadata: dict
+
+
+class IController(ABC):
     @abstractmethod
-    def __call__(self, data: Iterable) -> any:
+    def __call__(self, data: Iterable) -> ControllerResponse:
         pass
 
 
@@ -35,14 +43,14 @@ class AdditionalDataProxyController(ProxyController, ABC):
     def additional_data(self) -> Iterable:
         pass
 
-    def __call__(self, data: Optional[Iterable] = None) -> any:
+    def __call__(self, data: Optional[Iterable] = None) -> ControllerResponse:
         return super().__call__(
             self.additional_data
             if data is None
             else self._get_combine_additional_data_with(data)
         )
 
-    def _get_combine_additional_data_with(self, data: iterable) -> iterable:
+    def _get_combine_additional_data_with(self, data: Iterable) -> Iterable:
         if (
             is_iterable_but_not_dict(data)
             and is_iterable_but_not_dict(self.additional_data)
@@ -89,6 +97,10 @@ class FlaskJSONRequestAdditionalProxyController(AdditionalDataProxyController):
 
 
 class Controller(IController, ABC):
+    def __call__(self, data: Iterable) -> ControllerResponse:
+        response = self._handle_cleaned_data(self._get_cleaned_data_from(data))
+
+        return response if isinstance(response, ControllerResponse) else ControllerResponse(response)
 
     @abstractmethod
     def _get_cleaned_data_from(self, data: Iterable) -> Iterable:
@@ -160,7 +172,7 @@ class GetterController(SchemaController):
         self.schema = schema
         self.repository = repository
 
-    def _handle_cleaned_data(self, data: Iterable[dict]) -> list[dict]:
+    def _handle_cleaned_data(self, data: Iterable[dict]) -> ControllerResponse:
         received_data = list()
         non_existent_resource_data = list()
 
@@ -171,7 +183,10 @@ class GetterController(SchemaController):
                 self.schema.dump(resource, many=False)
             )
 
-        return {
-            'received': received_data,
-            'lost': non_existent_resource_data
-        }, (404 if non_existent_resource_data else 200)
+        return ControllerResponse(
+            status_code=(404 if non_existent_resource_data else 200),
+            payload={
+                'received': received_data,
+                'lost': non_existent_resource_data
+            }
+        )
