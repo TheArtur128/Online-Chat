@@ -134,6 +134,18 @@ class Repository(IRepository, ABC):
     def __iter__(self) -> iter:
         return iter(self.all())
 
+    def get_by(
+        self,
+        conditions: dict[str, SearchAnnotation | object | Iterable[SearchAnnotation]] = dict(),
+        *,
+        is_many: bool = False,
+        **additional_conditions: SearchAnnotation | object | Iterable[SearchAnnotation]
+    ) -> Optional[object | Iterable[object]]:
+        return self._get_by_conditions(
+            self._get_valid_conditions_by(conditions | additional_conditions),
+            is_many
+        )
+
     @classmethod
     def __class_getitem__(cls, supported_type_resource: type | Iterable[type]) -> type:
         return cls._annotation_factory(
@@ -144,6 +156,23 @@ class Repository(IRepository, ABC):
                 else (supported_type_resource, )
             )
         )
+
+    @abstractmethod
+    def _get_by_conditions(
+        self,
+        conditions: dict[str, Iterable[SearchAnnotation | object]],
+        is_many: bool
+    ) -> Optional[object] | Iterable[object]:
+        pass
+
+    def _get_valid_conditions_by(
+        self,
+        conditions: dict[str, SearchAnnotation | object | Iterable[SearchAnnotation]]
+    ) -> dict[str, Iterable[SearchAnnotation | object]]:
+        return {
+            _: (condition, ) if not isinstance(condition, Iterable) else condition
+            for _, condition in conditions.items()
+        }
 
 
 class SQLAlchemyRepository(Repository, ABC):
@@ -162,7 +191,6 @@ class SQLAlchemyRepository(Repository, ABC):
     def add(self, instance: db.Model) -> None:
         self._sqlalchemy_model.add(instance)
 
-    def get_by(self, *, is_many: bool = False, **conditions) -> db.Model | Iterable[db.Model] | None:
         objects = self._sqlalchemy_model.query.filter_by(**conditions)
 
         return objects.all() if is_many else objects.one()
@@ -170,6 +198,13 @@ class SQLAlchemyRepository(Repository, ABC):
     def remove(self, instance: db.Model) -> None:
         self._sqlalchemy_model.delete(instance)
 
+    def _get_by_conditions(
+        self,
+        conditions: dict[str, Iterable[SearchAnnotation | object]],
+        is_many: bool
+    ) -> Optional[db.Model] | Iterable[db.Model]:
+        objects = self._sqlalchemy_model.query.filter(*sqlalchemy_conditions)
+        return objects.all() if is_many else objects.first()
 
 class CustomSQLAlchemyRepository(SQLAlchemyRepository):
     def __init__(self, session: SQLAlchemy, sqlalchemy_model: db.Model):
