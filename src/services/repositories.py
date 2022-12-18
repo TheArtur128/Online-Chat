@@ -22,7 +22,13 @@ class IRepository(ABC):
         pass
 
     @abstractmethod
-    def get_by(self, *, is_many: bool = False, **conditions) -> Optional[object | Iterable]:
+    def get_by(
+        self,
+        conditions: dict[str, SearchAnnotation | object] = dict(),
+        *,
+        is_many: bool = False,
+        **additional_conditions: SearchAnnotation | object
+    ) -> Optional[object | Iterable]:
         pass
 
     @abstractmethod
