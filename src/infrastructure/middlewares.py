@@ -42,4 +42,19 @@ class DocumentaryErrorJSONResponseFormatter(JSONResponseErrorFormatter, TypeErro
         if error.document:
             response_body['detail'] = error.document
 
+        return response_body
+
+
+class ControllerResponseFormatterMiddleware(Middleware):
+    def __init__(self, response_formatter: Callable[[ControllerResponse], any]):
+        self.response_formatter = response_formatter
+
+    def call_route(self, route: Callable, *args, **kwargs) -> any:
+        result = route(*args, **kwargs)
+
+        return (
+            self.response_formatter(result)
+            if isinstance(result, ControllerResponse)
+            else result
+        )
 
