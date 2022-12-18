@@ -5,7 +5,7 @@ from tools.utils import create_length_validator_by_model_column, ASCIIRange
 from tools.validators import CharactersValidator
 
 
-class BaseUserSchema(Schema):
+class UserSchema(Schema):
     class Meta:
         unknown = EXCLUDE
 
@@ -27,6 +27,8 @@ class BaseUserSchema(Schema):
         error_messages={'required': "Url token is required."}
     )
 
+    name = fields.String(validate=[create_length_validator_by_model_column(User, 'name')])
+
     password_hash = fields.String(
         required=True,
         validate=[create_length_validator_by_model_column(User, 'password_hash')],
@@ -38,10 +40,6 @@ class BaseUserSchema(Schema):
         dump_only=True,
         error_messages={'required': "Password is required."}
     )
-
-
-class FullUserSchema(BaseUserSchema):
-    name = fields.String(validate=[create_length_validator_by_model_column(User, 'name')])
 
     avatar_path = fields.String(
         allow_none=True,
