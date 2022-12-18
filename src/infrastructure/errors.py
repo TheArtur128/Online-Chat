@@ -24,6 +24,7 @@ class InputControllerDataCorrectionError(DocumentaryError, StatusCodeError, Cont
     status_code = 400
 
 
+class ResorceError(ControllerError):
     pass
 
 
