@@ -1,12 +1,14 @@
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Iterable, Optional
+from json import dumps
 
 from beautiful_repr import StylizedMixin, Field, TemplateFormatter
 from flask import Response, request
 from marshmallow.validate import Length
 
 from orm import db
+from infrastructure.controllers import ControllerResponse
 
 
 def create_length_validator_by_model_column(model: db.Model, column: str) -> Length:
@@ -73,3 +75,25 @@ def is_iterable_but_not_dict(data: any) -> bool:
 
 def get_json_data_from_request() -> dict | Iterable:
     return request.json
+
+
+def get_flask_response_by_controller_response(controller_response: ControllerResponse) -> Response:
+    headers = dict(controller_response.metadata)
+
+    is_payload_json_like = (
+        isinstance(controller_response.payload, Iterable)
+        and any(not isinstance(item, str) for item in controller_response.payload)
+    )
+
+    if is_payload_json_like:
+        headers['Content-Type'] = 'application/json'
+
+    return Response(
+        response=(
+            dumps(controller_response.payload)
+            if is_payload_json_like
+            else controller_response.payload
+        ),
+        status=controller_response.status_code,
+        headers=headers
+    )
