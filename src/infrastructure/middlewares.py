@@ -1,4 +1,4 @@
-from typing import Callable
+from typing import Callable, Optional
 
 from flask import request
 from flask_middlewares import Middleware
@@ -11,19 +11,20 @@ from tools.utils import get_status_code_from_error
 
 
 class AccessTokenRequiredMiddleware(Middleware):
-    def __init__(self, jwt_decoder: IJWTDecoder):
+    def __init__(self, jwt_decoder: IJWTDecoder, access_token_getter: Callable[[], Optional[str]]):
         self.jwt_decoder = jwt_decoder
+        self.access_token_getter = access_token_getter
 
     def call_route(self, route: Callable, *args, **kwargs) -> any:
-        access_token = request.cookies.get('access_token') or request.headers.get('access_token')
+        access_token = self.access_token_getter()
 
         if not access_token:
-            raise AccessTokenInvalidError('Access token is missing')
+            raise AccessTokenInvalidError("Access token is missing")
 
         try:
             self.jwt_decoder.decode(access_token)
         except InvalidTokenError:
-            raise AccessTokenInvalidError('Access token is invalid')
+            raise AccessTokenInvalidError("Access token is invalid")
 
         return route(*args, **kwargs)
 
@@ -41,4 +42,4 @@ class DocumentaryErrorJSONResponseFormatter(JSONResponseErrorFormatter, TypeErro
         if error.document:
             response_body['detail'] = error.document
 
-        return response_body
+

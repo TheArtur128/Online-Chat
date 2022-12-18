@@ -5,7 +5,7 @@ from flask_middlewares.standard.sql_alchemy import SQLAlchemySessionFinisherMidd
 from config import DEFAULT_JWT_SERIALIZATOR_FACTORY
 from infrastructure.middlewares import AccessTokenRequiredMiddleware, DocumentaryErrorJSONResponseFormatter
 from orm import db
-from tools.utils import get_status_code_from_error
+from tools.utils import get_status_code_from_error, FlaskAccessTokenGetter
 
 
 GLOBAL_MIDDLEWARES = (
@@ -18,7 +18,10 @@ GLOBAL_MIDDLEWARES = (
         )
     )),
     SQLAlchemySessionFinisherMiddleware(db),
-    AccessTokenRequiredMiddleware(DEFAULT_JWT_SERIALIZATOR_FACTORY())
+    AccessTokenRequiredMiddleware(
+        DEFAULT_JWT_SERIALIZATOR_FACTORY(),
+        FlaskAccessTokenGetter('access-token')
+    )
 )
 
 MIDDLEWARES = (AbortBadStatusCodeMiddleware(), StatusCodeRedirectorMiddleware('views.login'))
