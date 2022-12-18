@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from typing import Optional, Iterable, Union, Callable
 
 from flask_sqlalchemy import SQLAlchemy
-
+from sqlalchemy.sql.expression import BinaryExpression, and_, or_
 from orm import db
 from orm.models import User
 
@@ -191,10 +191,6 @@ class SQLAlchemyRepository(Repository, ABC):
     def add(self, instance: db.Model) -> None:
         self._sqlalchemy_model.add(instance)
 
-        objects = self._sqlalchemy_model.query.filter_by(**conditions)
-
-        return objects.all() if is_many else objects.one()
-
     def remove(self, instance: db.Model) -> None:
         self._sqlalchemy_model.delete(instance)
 
@@ -203,8 +199,48 @@ class SQLAlchemyRepository(Repository, ABC):
         conditions: dict[str, Iterable[SearchAnnotation | object]],
         is_many: bool
     ) -> Optional[db.Model] | Iterable[db.Model]:
+        sqlalchemy_conditions = list()
+
+        for attribute_name, condition in conditions.items():
+            sqlalchemy_conditions.extend(self.__get_sqlalchemy_conditions_by(
+                condition, attribute_name
+            ))
+
         objects = self._sqlalchemy_model.query.filter(*sqlalchemy_conditions)
+
         return objects.all() if is_many else objects.first()
+
+    def __get_sqlalchemy_conditions_by(
+        self,
+        conditions: Iterable[SearchAnnotation | object],
+        attribute_name: str
+    ) -> Iterable[BinaryExpression]:
+        model_attribute = getattr(self._sqlalchemy_model, attribute_name)
+        sqlalchemy_conditions = list()
+
+        for condition in conditions:
+            if isinstance(condition, Greater):
+                sqlalchemy_conditions.append(model_attribute > condition.value)
+            elif isinstance(condition, Lesser):
+                sqlalchemy_conditions.append(model_attribute < condition.value)
+            elif isinstance(condition, GroupingAnnotation):
+                sqlalchemy_conditions.append(
+                    (or_ if isinstance(condition, Or) else and_)(
+                        *self.__get_sqlalchemy_conditions_by(
+                            condition.annotations,
+                            attribute_name
+                        )
+                    )
+                )
+            elif isinstance(condition, Equal) or not isinstance(condition, SearchAnnotation):
+                sqlalchemy_conditions.append(model_attribute == (
+                    condition.value
+                    if isinstance(condition, Equal)
+                    else condition
+                ))
+
+        return sqlalchemy_conditions
+
 
 class CustomSQLAlchemyRepository(SQLAlchemyRepository):
     def __init__(self, session: SQLAlchemy, sqlalchemy_model: db.Model):
