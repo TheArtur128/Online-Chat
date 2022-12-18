@@ -8,6 +8,43 @@ from orm import db
 from orm.models import User
 
 
+class SearchAnnotation:
+    pass
+
+
+@dataclass(frozen=True)
+class ValueAnnotation(SearchAnnotation):
+    value: any
+
+
+@dataclass(frozen=True)
+class Greater(ValueAnnotation):
+    pass
+
+
+@dataclass(frozen=True)
+class Lesser(ValueAnnotation):
+    pass
+
+
+@dataclass(frozen=True)
+class Equal(ValueAnnotation):
+    pass
+
+
+class GroupingAnnotation(SearchAnnotation):
+    def __init__(self, *annotations: SearchAnnotation):
+        self.annotations = annotations
+
+
+class And(GroupingAnnotation):
+    pass
+
+
+class Or(GroupingAnnotation):
+    pass
+
+
 class IRepository(ABC):
     @abstractmethod
     def __iter__(self) -> iter:
