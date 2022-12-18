@@ -26,7 +26,7 @@ class IRepository(ABC):
         pass
 
     @abstractmethod
-    def delete(self, instance: object) -> None:
+    def remove(self, instance: object) -> None:
         pass
 
 
@@ -124,7 +124,7 @@ class SQLAlchemyRepository(Repository, ABC):
 
         return objects.all() if is_many else objects.one()
 
-    def delete(self, instance: db.Model) -> None:
+    def remove(self, instance: db.Model) -> None:
         self._sqlalchemy_model.delete(instance)
 
 
