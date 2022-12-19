@@ -4,6 +4,7 @@ from typing import Callable, Iterable, Optional
 
 from marshmallow import Schema, ValidationError, fields
 from flask_sqlalchemy import SQLAlchemy
+from flask_middlewares.standard.error_handling import ProxyErrorHandler, IErrorHandler
 from flask import request, make_response, Response, jsonify
 from werkzeug.security import generate_password_hash
 

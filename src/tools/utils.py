@@ -6,6 +6,7 @@ from beautiful_repr import StylizedMixin, Field, TemplateFormatter
 from marshmallow.validate import Length
 
 from orm import db
+from tools.errors import StatusCodeError
 
 
 def create_length_validator_by_model_column(model: db.Model, column: str) -> Length:
