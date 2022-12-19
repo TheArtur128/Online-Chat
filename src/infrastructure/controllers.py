@@ -113,21 +113,6 @@ class CustomAdditionalDataProxyController(AdditionalDataProxyController):
         )
 
 
-class Controller(IController, ABC):
-    def __call__(self, data: Iterable) -> ControllerResponse:
-        response = self._handle_cleaned_data(self._get_cleaned_data_from(data))
-
-        return response if isinstance(response, ControllerResponse) else ControllerResponse(response)
-
-    @abstractmethod
-    def _get_cleaned_data_from(self, data: Iterable) -> Iterable:
-        pass
-
-    @abstractmethod
-    def _handle_cleaned_data(self, data: Iterable) -> ControllerResponse | object:
-        pass
-
-
 class SchemaDataCleanerProxyController(ProxyController):
     def __init__(self, controller: IController, schema: Schema):
         super().__init__(controller)
