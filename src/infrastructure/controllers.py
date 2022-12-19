@@ -46,7 +46,7 @@ class HanlderErrorController(ProxyController):
         self.error_handler = (
             error_handler_resource
             if isinstance(error_handler_resource, IErrorHandler)
-            proxy_error_handler_factory(error_handler_resource)
+            else proxy_error_handler_factory(error_handler_resource)
         )
 
     def __call__(self, data: Iterable) -> ControllerResponse:
