@@ -14,7 +14,7 @@ IS_GLOBAL_MIDDLEWARES_HIGHER = False
 
 MIDDLEWARES = (
     AbortBadStatusCodeMiddleware(),
-    StatusCodeRedirectorMiddleware('views.login')
+    StatusCodeRedirectorMiddleware('views.authorization', 403)
 )
 
 GLOBAL_MIDDLEWARES = (
