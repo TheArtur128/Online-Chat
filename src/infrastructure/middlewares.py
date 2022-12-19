@@ -60,3 +60,23 @@ class ControllerResponseFormatterMiddleware(Middleware):
         )
 
 
+class ReplacementErrorRaiser(IErrorHandler):
+    def __init__(
+        self,
+        error_factory_by_error_type: dict[type, Callable[[str], Exception]] = dict(),
+        **keyword_error_factory_by_error_type: Callable[[str], Exception]
+    ):
+        keyword_error_factory_by_error_type = {
+            globals()[factory_name]: _
+            for factory_name, _ in keyword_error_factory_by_error_type.items()
+        }
+
+        self.error_factory_by_error_type = (
+            error_factory_by_error_type
+            | keyword_error_factory_by_error_type
+        )
+
+    def __call__(self, error: Exception) -> any:
+        for error_type, error_factory in self.error_factory_by_error_type.items():
+            if isinstance(error, error_type):
+                raise error_factory(str(error))
