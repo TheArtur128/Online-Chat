@@ -128,10 +128,12 @@ class Controller(IController, ABC):
         pass
 
 
-class SchemaController(Controller, ABC):
-    _schema: Schema
+class SchemaDataCleanerProxyController(ProxyController):
+    def __init__(self, controller: IController, schema: Schema):
+        super().__init__(controller)
+        self.schema = schema
 
-    def _get_cleaned_data_from(self, data: Iterable) -> Iterable:
+    def __call__(self, data: Iterable) -> ControllerResponse:
         error_reports = self._schema.validate(data)
 
         if error_reports:
@@ -140,15 +142,23 @@ class SchemaController(Controller, ABC):
                 error_reports
             )
 
-        return self._schema.dump(data)
+        return super().__call__(self._schema.dump(data))
 
 
-class ServiceController(Controller, ABC):
-    _service: Callable
-    _is_service_input_multiple: bool = False
+class ServiceController(IController):
+    def __init__(
+        self,
+        service: Callable,
+        *,
+        is_service_input_multiple: bool = False,
+        response_factory: Callable[[any, int, dict], ControllerResponse] = ControllerResponse
+    ):
+        self.service = service
+        self.is_service_input_multiple = is_service_input_multiple
+        self.response_factory = response_factory
 
-    def _handle_cleaned_data(self, data: Iterable) -> any:
-        return (
+    def __call__(self, data: Iterable) -> ControllerResponse:
+        return self.response_factory(
             tuple(map(self._call_service_by, data))
             if self._is_service_input_multiple
             else self._call_service_by(data)
@@ -158,38 +168,12 @@ class ServiceController(Controller, ABC):
         return self._service(*data) if is_iterable_but_not_dict(data) else self._service(**data)
 
 
-class ExternalController(ServiceController, SchemaController, ABC):
-    def __init__(self, *, is_service_input_multiple: bool = False):
-        self.is_service_input_multiple = is_service_input_multiple
-
-    @property
-    def is_service_input_multiple(self) -> bool:
-        return self._is_service_input_multiple
-
-    @is_service_input_multiple.setter
-    def is_service_input_multiple(self, is_service_input_multiple: bool) -> None:
-        self._is_service_input_multiple = self._schema.many = is_service_input_multiple
-
-
-class CustomExternalController(ExternalController):
-    service = DelegatingProperty('_service')
-    schema = DelegatingProperty('_schema')
-
-    def __init__(self, service: Callable, schema: Schema, *, is_service_input_multiple: bool = False):
-        self.service = service
-        self.schema = schema
-
-        super().__init__(is_service_input_multiple=is_service_input_multiple)
-
-
-class GetterController(SchemaController):
-    schema = DelegatingProperty('_schema')
-
+class GetterController(IController):
     def __init__(self, repository: IRepository, schema: Schema):
         self.repository = repository
         self.schema = schema
 
-    def _handle_cleaned_data(self, data: Iterable[dict]) -> ControllerResponse:
+    def __call__(self, data: Iterable) -> ControllerResponse:
         received_data = list()
         non_existent_resource_data = list()
 
