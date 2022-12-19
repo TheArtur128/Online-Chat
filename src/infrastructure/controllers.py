@@ -33,6 +33,28 @@ class ProxyController(IController):
         return self.controller(data)
 
 
+class HanlderErrorController(ProxyController):
+    def __init__(
+        self,
+        controller: IController,
+        error_handler_resource: Iterable[IErrorHandler] | IErrorHandler,
+        *,
+        proxy_error_handler_factory: Callable[[Iterable[IErrorHandler]], IErrorHandler] = ProxyErrorHandler
+    ):
+        super().__init__(controller)
+        self.error_handler = (
+            error_handler_resource
+            if isinstance(error_handler_resource, IErrorHandler)
+            proxy_error_handler_factory(error_handler_resource)
+        )
+
+    def __call__(self, data: Iterable) -> ControllerResponse:
+        try:
+            return super().__call__(data)
+        except Exception as error:
+            return self.error_handler(error)
+
+
 class AdditionalDataProxyController(ProxyController, ABC):
     def __init__(self, controller: IController, *, is_data_showing_in_error: bool = False):
         super().__init__(controller)
