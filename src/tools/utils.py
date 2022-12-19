@@ -55,7 +55,11 @@ def get_time_after(minutes: int, is_time_raw: bool = False) -> datetime | float:
 
 
 def get_status_code_from_error(error: Exception, *, default_error_code: int = 500) -> int:
-    return StatusCodeError.status_code if isinstance(error, StatusCodeError) else default_error_code
+    return (
+        error.status_code
+        if isinstance(error, StatusCodeError)
+        else default_error_code
+    )
 
 
 def is_iterable_but_not_dict(data: any) -> bool:
