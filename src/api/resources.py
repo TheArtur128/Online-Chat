@@ -31,8 +31,6 @@ class MiddlewareResourceMixin(MiddlewareKeeper, Resource, ABC):
         super(Resource, self).__init__()
 
 
-class UserResource(Resource):
-    get = FlaskJSONRequestAdditionalProxyController(GetterController(
 class ProxyControllerResourceMixin(Resource, ABC):
     _global_proxy_controller_factory: Callable[[Iterable[IController]], IController]
 
@@ -49,10 +47,14 @@ class ProxyControllerResourceMixin(Resource, ABC):
         super().__init__()
 
 
+class UserResource(ProxyControllerResourceMixin):
+    _global_proxy_controller_factory = FlaskJSONRequestAdditionalProxyController
+
+    get = GetterController(
         UserRepository(db),
         UserSchema(many=True, exclude=('password', 'password_hash'))
-    ))
-    post = FlaskJSONRequestAdditionalProxyController(SchemaDataCleanerProxyController(
+    )
+
+    post = SchemaDataCleanerProxyController(
         ServiceController(AccountRegistrar(UserRepository(db))),
         UserSchema(many=True, exclude=('password', ))
-    ))
