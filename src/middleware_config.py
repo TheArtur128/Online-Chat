@@ -21,7 +21,7 @@ GLOBAL_MIDDLEWARES = (
             (AccessTokenInvalidError, ),
             get_status_code_from_error,
             is_format_type=False
-        )
+        ),
     )),
     SQLAlchemySessionFinisherMiddleware(db),
     AccessTokenRequiredMiddleware(
