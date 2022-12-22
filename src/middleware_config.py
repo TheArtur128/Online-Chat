@@ -26,7 +26,7 @@ GLOBAL_MIDDLEWARES = (
     )),
     SQLAlchemySessionFinisherMiddleware(db),
     AccessTokenRequiredMiddleware(
-        DEFAULT_JWT_SERIALIZATOR_FACTORY(),
+        TokenPromiser(DEFAULT_JWT_SERIALIZATOR_FACTORY()),
         FlaskAccessTokenGetter('access-token')
     )
 )
