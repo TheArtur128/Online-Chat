@@ -1,10 +1,9 @@
 from abc import ABC
-from typing import Iterable
+from typing import Iterable, Callable
 
 from flask_restful import Resource
 from flask_middlewares import MiddlewareKeeper, Middleware
 
-from config import DEFAULT_USER_SESSION_FACTORY, DEFAULT_ACCESS_TOKEN_FACTORY
 from frameworks.flask import FlaskJSONRequestAdditionalProxyController
 from frameworks.repositories import UserRepository
 from frameworks.schemes import UserSchema

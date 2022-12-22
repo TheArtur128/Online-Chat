@@ -1,6 +1,6 @@
+from functools import partial
 from os import getenv
 from secrets import token_hex
-from functools import partial
 
 from dotenv import load_dotenv
 
