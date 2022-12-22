@@ -18,7 +18,7 @@ GLOBAL_MIDDLEWARES = (
     ControllerResponseFormatterMiddleware(get_flask_response_by_controller_response),
     CustomHandlerErrorMiddleware((
         CustomJSONResponseErrorFormatter(
-            (Exception, ),
+            (AccessTokenInvalidError, ),
             get_status_code_from_error,
             is_format_type=False
         )
