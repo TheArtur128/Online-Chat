@@ -17,7 +17,6 @@ IS_GLOBAL_MIDDLEWARES_HIGHER = False
 GLOBAL_MIDDLEWARES = (
     ControllerResponseFormatterMiddleware(get_flask_response_by_controller_response),
     CustomHandlerErrorMiddleware((
-        DocumentaryErrorJSONResponseFormatter(),
         CustomJSONResponseErrorFormatter(
             (Exception, ),
             get_status_code_from_error,
@@ -32,7 +31,15 @@ GLOBAL_MIDDLEWARES = (
 )
 
 MIDDLEWARE_ENVIRONMENTS = {
-    'api': {'USE_FOR_BLUEPRINT': True}
+    'api': {
+        'USE_FOR_BLUEPRINT': True,
+        'IS_GLOBAL_MIDDLEWARES_HIGHER': False,
+        'MIDDLEWARES': (
+            CustomHandlerErrorMiddleware((
+                DocumentaryErrorJSONResponseFormatter(),
+            )),
+        )
+    },
     'views': {
         'USE_FOR_BLUEPRINT': True,
         'IS_GLOBAL_MIDDLEWARES_HIGHER': False,
