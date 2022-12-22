@@ -13,7 +13,7 @@ from infrastructure.controllers import IController, SchemaDataCleanerProxyContro
 from orm import db
 
 
-class MiddlewareResource(MiddlewareKeeper, Resource, ABC):
+class MiddlewareResourceMixin(MiddlewareKeeper, Resource, ABC):
     _internal_middlewares: Iterable[Middleware]
 
     def __init__(self, *args, **kwargs):
