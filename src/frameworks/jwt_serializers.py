@@ -17,5 +17,8 @@ class JWTSerializator(ITokenSerializator):
     def encode(self, data: dict, *, headers: dict = dict()) -> str:
         return encode(data, key=self.key, algorithm=self.algorithm, headers=headers)
 
-    def decode(self, token: str) -> dict:
-        return decode(token, key=self.key, algorithms=(self.algorithm, ), leeway=self.leeway)
+    def decode(self, token: str) -> dict | TokenDecoderResult:
+        try:
+            return decode(token, key=self.key, algorithms=(self.algorithm, ), leeway=self.leeway)
+        except InvalidTokenError:
+            return TokenDecoderResult.INCORRECT

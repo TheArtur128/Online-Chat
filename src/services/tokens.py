@@ -1,11 +1,18 @@
 from abc import ABC, abstractmethod
 from typing import Optional
+from enum import Enum, auto
+
+from services.errors import MissingTokenError, InvalidTokenError
 
 
 class ITokenCoder(ABC):
     @abstractmethod
     def encode(self, data: dict) -> str:
         pass
+
+
+class TokenDecoderResult(Enum):
+    INCORRECT = auto()
 
 
 class ITokenDecoder(ABC):
