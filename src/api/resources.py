@@ -8,8 +8,8 @@ from config import DEFAULT_USER_SESSION_FACTORY, DEFAULT_ACCESS_TOKEN_FACTORY
 from frameworks.flask import FlaskJSONRequestAdditionalProxyController
 from frameworks.repositories import UserRepository
 from frameworks.schemes import UserSchema
-from services.account import AccountRegistrar
 from infrastructure.controllers import IController, SchemaDataCleanerProxyController, ServiceController, GetterController
+from services.authorization import AccountRegistrar
 from orm import db
 
 
@@ -58,3 +58,4 @@ class UserResource(ProxyControllerResourceMixin):
     post = SchemaDataCleanerProxyController(
         ServiceController(AccountRegistrar(UserRepository(db))),
         UserSchema(many=True, exclude=('password', ))
+    )

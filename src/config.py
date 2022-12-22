@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 
 from frameworks.factories import CustomMinuteUserSessionFactory
 from frameworks.jwt_serializers import JWTSerializator
-from services.account import AccountAccessTokenFactory
+from services.authorization import AccountTokenFactory
 from orm.models import UserSession
 
 

@@ -2,7 +2,7 @@ from abc import ABC
 
 from services.errors import AccountAlreadyExistsError
 from services.repositories import Repository
-from services.serializers import ICoder
+from services.tokens import ITokenCoder
 from tools.utils import get_time_after
 
 
@@ -23,13 +23,13 @@ class AccountRegistrar:
         self.account_repository.add(account)
 
 
-class AccountAccessTokenFactory:
-    def __init__(self, access_token_coder: ICoder, life_minutes: int | float):
-        self.access_token_coder = access_token_coder
+class AccountTokenFactory:
+    def __init__(self, token_coder: ITokenCoder, life_minutes: int | float):
+        self.token_coder = token_coder
         self.life_minutes = life_minutes
 
     def __call__(self, account: Account) -> str:
-        return self.access_token_coder.encode({
+        return self.token_coder.encode({
             'url_token': account.url_token,
             'exp': get_time_after(self.life_minutes, is_time_raw=True)
         })
