@@ -31,3 +31,13 @@ class ITokenPromiser(ABC):
         pass
 
 
+class TokenPromiser(ITokenPromiser):
+    def __init__(self, token_decoder: ITokenDecoder):
+        self.token_decoder = token_decoder
+
+    def __call__(self, token: Optional[str]) -> None:
+        if not token:
+            raise MissingTokenError("Token is missing")
+        
+        if self.token_decoder.decode(token) is TokenDecoderResult.INCORRECT:
+            raise InvalidTokenError("Token is invalid")

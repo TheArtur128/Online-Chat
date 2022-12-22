@@ -12,3 +12,15 @@ class AccountRegistrarError(AccountServiceError):
 
 class AccountAlreadyExistsError(AccountRegistrarError):
     pass
+
+
+class TokenError(ServiceError):
+    pass
+
+
+class MissingTokenError(TokenError):
+    pass
+
+
+class InvalidTokenError(TokenError):
+    pass
