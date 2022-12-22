@@ -8,14 +8,6 @@ class InfrastructureError(Exception):
     pass
 
 
-class AuthenticationError(StatusCodeError):
-    status_code = 401
-
-
-class AuthorizationError(StatusCodeError):
-    status_code = 403
-
-
 class ControllerError(InfrastructureError):
     pass
 
@@ -36,5 +28,5 @@ class UserAlreadyExistsError(StatusCodeError):
     status_code = 409
 
 
-class AccessTokenInvalidError(AuthorizationError):
-    pass
+class AccessTokenInvalidError(StatusCodeError):
+    status_code = 403
