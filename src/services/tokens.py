@@ -25,3 +25,9 @@ class ITokenSerializator(ITokenCoder, ITokenDecoder, ABC):
     pass
 
 
+class ITokenPromiser(ABC):
+    @abstractmethod
+    def __call__(self, token: Optional[str]) -> None:
+        pass
+
+
