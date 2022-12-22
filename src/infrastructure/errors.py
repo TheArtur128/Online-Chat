@@ -24,7 +24,7 @@ class ControllerResourceNotFoundError(DocumentaryError, StatusCodeError, Resorce
     status_code = 404
 
 
-class UserAlreadyExistsError(StatusCodeError):
+class UserAlreadyExistsError(StatusCodeError, ResorceError):
     status_code = 409
 
 
