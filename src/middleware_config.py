@@ -37,6 +37,11 @@ MIDDLEWARE_ENVIRONMENTS = {
         'MIDDLEWARES': (
             CustomHandlerErrorMiddleware((
                 DocumentaryErrorJSONResponseFormatter(),
+                CustomJSONResponseErrorFormatter(
+                    (ResorceError, ),
+                    get_status_code_from_error,
+                    is_format_type=False
+                )
             )),
         )
     },
