@@ -16,21 +16,22 @@ from tools.utils import get_status_code_from_error
 IS_GLOBAL_MIDDLEWARES_HIGHER = False
 
 GLOBAL_MIDDLEWARES = (
-    DecoratorMiddleware(partial(
-        ActionChain(get_flask_response_by_controller_response).clone_with,
-        is_other_handlers_on_the_left=True
-    )),
+    DecoratorMiddleware(
+        partial(
+            ActionChain(get_flask_response_by_controller_response).clone_with,
+            is_other_handlers_on_the_left=True
+        )
+    ),
     DecoratorMiddleware(
         post_partial(
             rollbackable,
             on_condition(
                 post_partial(isinstance, AccessTokenInvalidError),
                 mergely(
-                    take(execute_operation),
+                    take(dict),
                     ExceptionDictTemplater(is_format_type=False),
-                    '|',
-                    get_status_code_from_error |then>> partial(bind, dict, 'status_code')
-                ),
+                    status_code=get_status_code_from_error
+                ) |then>> jsonify,
                 else_=raise_
             )
         )
