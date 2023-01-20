@@ -57,15 +57,18 @@ MIDDLEWARE_ENVIRONMENTS = {
         'IS_GLOBAL_MIDDLEWARES_HIGHER': False,
         'MIDDLEWARES': (
             DecoratorMiddleware(
-                post_partial(
-                    rollbackable,
-                    CustomJSONResponseErrorFormatter(
-                        (ResorceError, ),
-                        get_status_code_from_error,
-                        is_format_type=False
-                    ) |then>> DocumentaryErrorJSONResponseFormatter()
+                mergely(
+                    take(dict),
+                    on_condition(
+                        post_partial(isinstance, DocumentaryError),
+                        partial(convert_documentary_error_to_dict, is_format_type=False),
+                        else_=ExceptionDictTemplater(is_format_type=False)
+                    ),
+                    status_code=get_status_code_from_error
                 )
-            )
+                >= partial(on_condition, post_partial(isinstance, ResorceError), else_=raise_)
+                |then>> close(rollbackable, closer=post_partial)
+            ),
         )
     },
     'views': {
