@@ -1,5 +1,29 @@
 from typing import Callable, Iterable
 
+from tools.errors import DocumentaryError
+
+
+def convert_documentary_error_to_dict(
+    error: DocumentaryError,
+    *,
+    is_convert_error_type_name: bool = True,
+    is_convert_error_message: bool = True,
+    is_convert_error_detail: bool = True
+) -> dict:
+    result_dict = (
+        {'error-type': type(error).__name__}
+        if is_convert_error_type_name
+        else dict()
+    )
+
+    if error.message and is_convert_error_message:
+        result_dict['message'] = error.message
+
+    if error.document and is_convert_error_detail:
+        result_dict['detail'] = error.document
+
+    return result_dict
+
 
 def format_dict(
         data: dict,
