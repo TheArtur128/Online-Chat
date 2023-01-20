@@ -4,7 +4,6 @@ from typing import Callable, Iterable, Optional
 
 from marshmallow import Schema, ValidationError, fields
 from flask_sqlalchemy import SQLAlchemy
-from flask_middlewares.standard.error_handling import ProxyErrorHandler, IErrorHandler
 from flask import request, make_response, Response, jsonify
 from werkzeug.security import generate_password_hash
 
@@ -32,28 +31,6 @@ class ProxyController(IController):
 
     def __call__(self, data: Iterable) -> ControllerResponse:
         return self.controller(data)
-
-
-class HanlderErrorController(ProxyController):
-    def __init__(
-        self,
-        controller: IController,
-        error_handler_resource: Iterable[IErrorHandler] | IErrorHandler,
-        *,
-        proxy_error_handler_factory: Callable[[Iterable[IErrorHandler]], IErrorHandler] = ProxyErrorHandler
-    ):
-        super().__init__(controller)
-        self.error_handler = (
-            error_handler_resource
-            if isinstance(error_handler_resource, IErrorHandler)
-            else proxy_error_handler_factory(error_handler_resource)
-        )
-
-    def __call__(self, data: Iterable) -> ControllerResponse:
-        try:
-            return super().__call__(data)
-        except Exception as error:
-            return self.error_handler(error)
 
 
 class AdditionalDataProxyController(ProxyController, ABC):
