@@ -29,10 +29,10 @@ GLOBAL_MIDDLEWARES = (
             on_condition(
                 post_partial(isinstance, AccessTokenInvalidError),
                 mergely(
-                    take(dict),
                     ExceptionDictTemplater(is_format_type=False),
+                    take(dict |then>> jsonify),
                     status_code=get_status_code_from_error
-                ) |then>> jsonify,
+                ),
                 else_=raise_
             )
         )
