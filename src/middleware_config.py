@@ -57,7 +57,7 @@ MIDDLEWARE_ENVIRONMENTS = {
         'MIDDLEWARES': (
             DecoratorMiddleware(
                 mergely(
-                    take(dict),
+                    take(dict |then>> jsonify),
                     on_condition(
                         post_partial(isinstance, DocumentaryError),
                         partial(convert_documentary_error_to_dict, is_converting_error_type_name=False),
