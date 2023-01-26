@@ -60,7 +60,7 @@ MIDDLEWARE_ENVIRONMENTS = {
                     take(dict),
                     on_condition(
                         post_partial(isinstance, DocumentaryError),
-                        partial(convert_documentary_error_to_dict, is_format_type=False),
+                        partial(convert_documentary_error_to_dict, is_converting_error_type_name=False),
                         else_=mergely(take(dict), message=str)
                     ),
                     status_code=get_status_code_from_error
