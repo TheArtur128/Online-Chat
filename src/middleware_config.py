@@ -41,7 +41,7 @@ GLOBAL_MIDDLEWARES = (
     DecoratorMiddleware(
         mergely(
             take(rollbackable),
-            close(call |then>> returnly(eventually(db.session.commit))),
+            db.session.commit >= eventually |then>> returnly |then>> post_action_decorator
             db.session.rollback >= eventually |then>> returnly |then>> take
         )
     ),
