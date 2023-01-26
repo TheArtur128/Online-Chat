@@ -25,8 +25,7 @@ GLOBAL_MIDDLEWARES = (
         )
     ),
     DecoratorMiddleware(
-        post_partial(
-            rollbackable,
+        close(rollbackable, closer=post_partial)(
             on_condition(
                 post_partial(isinstance, AccessTokenInvalidError),
                 mergely(
