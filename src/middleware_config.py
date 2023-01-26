@@ -1,7 +1,6 @@
 from flask import jsonify, abort
 from flask_middlewares import DecoratorMiddleware
-from flask_middlewares.standard.status_code import StatusCodeRedirectorMiddleware
-from flask_middlewares.tools import ExceptionDictTemplater, get_status_code_from, StatusCodeGroup
+from flask_middlewares.tools import get_status_code_from, StatusCodeGroup
 
 from config import DEFAULT_JWT_SERIALIZATOR_FACTORY
 from frameworks.flask import get_flask_response_by_controller_response, FlaskAccessTokenGetter
