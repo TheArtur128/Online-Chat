@@ -4,6 +4,8 @@ from typing import Iterable
 
 from beautiful_repr import StylizedMixin, Field, TemplateFormatter
 from marshmallow.validate import Length
+from pyhandling import ActionChain, call, then, close
+from pyhandling.annotations import decorator
 
 from orm import db
 from tools.errors import StatusCodeError
@@ -65,3 +67,6 @@ def get_status_code_from_error(error: Exception, *, default_error_code: int = 50
 
 def is_iterable_but_not_dict(data: any) -> bool:
     return isinstance(data, Iterable) and not isinstance(data, dict)
+
+
+post_action_decorator: decorator = ActionChain(call).clone_with |then>> close
