@@ -12,7 +12,7 @@ from pyhandling import *
 from services.tokens import TokenPromiser
 from tools.errors import DocumentaryError
 from tools.formatters import convert_documentary_error_to_dict
-from tools.utils import get_status_code_from_error
+from tools.utils import get_status_code_from_error, post_action_decorator
 
 
 IS_GLOBAL_MIDDLEWARES_HIGHER = False
@@ -85,7 +85,13 @@ MIDDLEWARE_ENVIRONMENTS = {
                     )
                 )
             )),
-            StatusCodeRedirectorMiddleware('views.authorization', 403)
+            DecoratorMiddleware(post_action_decorator(
+                get_status_code_from
+                |then>> on_condition(
+                    post_partial(execute_operation, '==', 403),
+                    "views.authorization" >= close(redirect) |then>> eventually
+                )
+            ))
         )
     }
 }
