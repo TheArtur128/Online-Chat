@@ -29,8 +29,8 @@ GLOBAL_MIDDLEWARES = (
             on_condition(
                 post_partial(isinstance, AccessTokenInvalidError),
                 mergely(
-                    ExceptionDictTemplater(is_format_type=False),
                     take(dict |then>> jsonify),
+                    message=str,
                     status_code=get_status_code_from_error
                 ),
                 else_=raise_
@@ -61,7 +61,7 @@ MIDDLEWARE_ENVIRONMENTS = {
                     on_condition(
                         post_partial(isinstance, DocumentaryError),
                         partial(convert_documentary_error_to_dict, is_format_type=False),
-                        else_=ExceptionDictTemplater(is_format_type=False)
+                        else_=mergely(take(dict), message=str)
                     ),
                     status_code=get_status_code_from_error
                 )
