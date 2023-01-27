@@ -20,7 +20,7 @@ GLOBAL_MIDDLEWARES = (
     DecoratorMiddleware(
         partial(
             ActionChain(get_flask_response_by_controller_response).clone_with,
-            is_other_handlers_on_the_left=True
+            is_other_handlers_left=True
         )
     ),
     DecoratorMiddleware(
