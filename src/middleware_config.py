@@ -19,12 +19,7 @@ from tools.utils import get_status_code_from_error
 IS_GLOBAL_MIDDLEWARES_HIGHER = False
 
 GLOBAL_MIDDLEWARES = (
-    DecoratorMiddleware(
-        partial(
-            ActionChain(get_flask_response_by_controller_response).clone_with,
-            is_other_handlers_left=True
-        )
-    ),
+    get_flask_response_by_controller_response >= next_action_decorator_of |then>> DecoratorMiddleware,
     DecoratorMiddleware(
         close(rollbackable, closer=post_partial)(
             on_condition(
