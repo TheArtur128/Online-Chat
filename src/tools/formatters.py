@@ -1,26 +1,26 @@
 from typing import Callable, Iterable
 
-from tools.errors import DocumentaryError
+from tools.errors import ReportingError
 
 
-def convert_documentary_error_to_dict(
-    error: DocumentaryError,
+def convert_error_report_to_dict(
+    report: ReportingError,
     *,
     is_converting_error_type_name: bool = True,
     is_converting_error_message: bool = True,
     is_converting_error_detail: bool = True
 ) -> dict:
     result_dict = (
-        {'error-type': type(error).__name__}
+        {'error-type': type(report.error).__name__}
         if is_converting_error_type_name
         else dict()
     )
 
     if error.message and is_converting_error_message:
-        result_dict['message'] = error.message
+        result_dict['message'] = str(report.error)
 
     if error.document and is_converting_error_detail:
-        result_dict['detail'] = error.document
+        result_dict['detail'] = report.document
 
     return result_dict
 
