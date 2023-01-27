@@ -12,6 +12,9 @@ from services.repositories import IRepository
 from tools.utils import is_iterable_but_not_dict, DelegatingProperty
 
 
+controller = factory_for[ControllerResponse]
+
+
 @dataclass(frozen=True)
 class ControllerResponse:
     payload: any
