@@ -77,3 +77,18 @@ def dict_value_map(value_transformer: handler, dict_: dict) -> dict:
     }
 
 
+def combine_data_chunks(first_chunk: Iterable, second_chunk: Iterable) -> Iterable:
+    if all(map(is_iterable_but_not_dict, (first_chunk, second_chunk))):
+        return (*first_chunk, *second_chunk)
+    elif isinstance(second_chunk, dict) and isinstance(first_chunk, dict):
+        return first_chunk | second_chunk
+    else:
+        raise ReportingError(
+            TypeError("Incompatible input chunks types"),
+            dict(
+                first_chunk_type=type(first_chunk).__name__,
+                second_chunk_type=type(second_chunk).__name__
+            )
+        )
+
+
