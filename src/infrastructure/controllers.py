@@ -33,60 +33,7 @@ class ProxyController(IController):
         return self.controller(data)
 
 
-class AdditionalDataProxyController(ProxyController, ABC):
-    def __init__(self, controller: IController, *, is_data_showing_in_error: bool = False):
-        super().__init__(controller)
-        self.is_data_showing_in_error = is_data_showing_in_error
-
-    @property
-    @abstractmethod
-    def additional_data(self) -> Iterable:
-        pass
-
-    def __call__(self, data: Optional[Iterable] = None) -> ControllerResponse:
-        return super().__call__(
-            self.additional_data
-            if data is None
-            else self._get_combine_additional_data_with(data)
-        )
-
-    def _get_combine_additional_data_with(self, data: Iterable) -> Iterable:
-        if (
-            is_iterable_but_not_dict(data)
-            and is_iterable_but_not_dict(self.additional_data)
-        ):
-            data = (*data, *self.additional_data)
-        elif isinstance(data, dict) and isinstance(self.additional_data, dict):
-            data = self.additional_data | data
-        else:
-            raise InputControllerDataCorrectionError(
-                "Incompatible input data and additional data types",
-                dict(
-                    input_data_type=type(data).__name__,
-                    additional_data_type=type(self.additional_data).__name__
-                )
             )
-
-        return data
-
-
-class CustomAdditionalDataProxyController(AdditionalDataProxyController):
-    def __init__(
-        self, 
-        controller: IController, 
-        additional_data_resource: Callable[[], Iterable | dict] | Iterable | dict,
-        *,
-        is_data_showing_in_error: bool = False
-    ):
-        super().__init__(controller, is_data_showing_in_error)
-        self.additional_data_resource = additional_data_resource
-
-    @property
-    def additional_data(self) -> Iterable | dict:
-        return (
-            self.additional_data_resource()
-            if isinstance(self.additional_data_resource, Callable)
-            else self.additional_data_resource
         )
 
 
