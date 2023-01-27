@@ -1,29 +1,46 @@
 from abc import ABC
-from typing import Optional
+from functools import cached_property, partial
+
+from pyhandling import DelegatingProperty, execute_operation
+
+from tools.formatters import format_dict
 
 
 class ToolError(Exception):
     pass
 
 
-class DocumentaryError(ToolError):
-    def __init__(self, message_template: str = str(), document: Optional[dict] = None):
-        self.message_template = message_template
-        self.document = document
+class DecoratorError(ToolError):
+    error = DelegatingProperty("_error")
 
-    @property
-    def message(self) -> str:
-        return (
-            self.message_template.format(document=str(self.document))
-            if self.document is not None and '{document}' in self.message_template
-            else self.message_template
+    def __init__(self, error: Exception):
+        self._error = error
+
+    @cached_property
+    def all_errors(self) -> tuple[Exception]:
+        return partial(execute_operation, (self, ), '+')(
+            self._error.deep_errors
+            if isinstance(self._error, DecoratorError)
+            else (self._error, )
         )
 
     def __str__(self) -> str:
+        return f"{type(self).__name__} as {type(self._error).__name__}"
+
+
+class ReportingError(DecoratorError):
+    document = DelegatingProperty("_document")
+
+    def __init__(self, error: Exception, document: dict):
+        super().__init__(error)
+        self._document = document
+
+    def __str__(self) -> str:
+        formatted_report = format_dict(self._document, line_between_key_and_value='=')
+
         return (
-            str(self.document)
-            if not self.message_template and self.document is not None
-            else self.message
+            super().__str__()
+            + f" with {formatted_document}" if self._document else str()
         )
 
 
