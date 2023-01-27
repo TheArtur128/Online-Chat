@@ -1,0 +1,8 @@
+alembic==1.8.1
+beautiful_repr==1.1.1
+Flask_Middlewares==1.0.9
+Flask_Migrate==4.0.0
+Flask_RESTful==0.3.9
+Pyhandling==2.1.2
+PyJWT==2.6.0
+SQLAlchemy==1.4.44
