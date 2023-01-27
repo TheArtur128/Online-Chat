@@ -19,24 +19,6 @@ class ControllerResponse:
     metadata: dict = field(default_factory=dict)
 
 
-class IController(ABC):
-    @abstractmethod
-    def __call__(self, data: Iterable) -> ControllerResponse:
-        pass
-
-
-class ProxyController(IController):
-    def __init__(self, controller: IController):
-        self.controller = controller
-
-    def __call__(self, data: Iterable) -> ControllerResponse:
-        return self.controller(data)
-
-
-            )
-        )
-
-
 class SearchResult(TypedDict):
     found: Iterable = tuple()
     lost: Iterable = tuple()
