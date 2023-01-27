@@ -5,9 +5,9 @@ from flask_restful import Resource
 from pyhandling import then, positionally_unpack
 from pyhandling.annotations import decorator
 
-from frameworks.flask import FlaskJSONRequestAdditionalProxyController
 from frameworks.repositories import UserRepository
-from frameworks.schemes import UserSchema
+from frameworks.schemes import UserSchema, user_schema_without_password
+from infrastructure.controllers import load_to, search_in
 from services.authorization import AccountRegistrar
 from orm import db
 from tools.utils import decorator_for_addition_data_by, dict_value_map
@@ -32,12 +32,14 @@ class DecoratedResourceMixin(Resource, ABC):
 class UserResource(DecoratedResourceMixin):
     _decorator = decorator_for_addition_data_by(request.json)
 
-    get = GetterController(
-        UserRepository(db),
-        UserSchema(many=True, exclude=('password', 'password_hash'))
+    get = (
+        partial(load_to, user_schema_without_password(many=True))
+        |then>> partial(positionally_unpack, partial(search_in, UserRepository(db)))
+        |then>> partial(dict_value_map, user_schema_without_password().dump)
     )
 
-    post = SchemaDataCleanerProxyController(
-        ServiceController(AccountRegistrar(UserRepository(db))),
-        UserSchema(many=True, exclude=('password', ))
+    post = (
+        partial(load_to, UserSchema(exclude=["password"]))
+        |then>> partial(positionally_unpack, UserRepository(db).get_by)
+        |then>> AccountRegistrar(UserRepository(db))
     )
