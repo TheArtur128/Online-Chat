@@ -44,5 +44,3 @@ class ReportingError(DecoratorError):
         )
 
 
-class StatusCodeError(ToolError, ABC):
-    status_code: int
