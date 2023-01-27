@@ -6,13 +6,12 @@ from flask_restful import Resource
 from frameworks.flask import FlaskJSONRequestAdditionalProxyController
 from frameworks.repositories import UserRepository
 from frameworks.schemes import UserSchema
-from infrastructure.controllers import IController, SchemaDataCleanerProxyController, ServiceController, GetterController
 from services.authorization import AccountRegistrar
 from orm import db
 
 
-class ProxyControllerResourceMixin(Resource, ABC):
-    _global_proxy_controller_factory: Callable[[Iterable[IController]], IController]
+class DecoratedResourceMixin(Resource, ABC):
+    _decorator: decorator
 
     def __init__(self, *args, **kwargs):
         for method_name in self.methods:
@@ -21,7 +20,7 @@ class ProxyControllerResourceMixin(Resource, ABC):
             setattr(
                 self,
                 method_name,
-                self._global_proxy_controller_factory((getattr(self, method_name), ))
+                self._decorator(getattr(self, method_name))
             )
 
         super().__init__()
