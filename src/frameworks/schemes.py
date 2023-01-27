@@ -57,3 +57,6 @@ class UserSchema(Schema):
             data['name'] = data['url_token']
 
         return data
+
+
+user_schema_without_password = partial(UserSchema, exclude=('password', 'password_hash'))
