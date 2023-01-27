@@ -1,7 +1,9 @@
 from abc import ABC
-from typing import Iterable, Callable
+from functools import partial
 
 from flask_restful import Resource
+from pyhandling import then, positionally_unpack
+from pyhandling.annotations import decorator
 
 from frameworks.flask import FlaskJSONRequestAdditionalProxyController
 from frameworks.repositories import UserRepository
