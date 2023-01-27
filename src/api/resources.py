@@ -8,6 +8,7 @@ from frameworks.repositories import UserRepository
 from frameworks.schemes import UserSchema
 from services.authorization import AccountRegistrar
 from orm import db
+from tools.utils import decorator_for_addition_data_by, dict_value_map
 
 
 class DecoratedResourceMixin(Resource, ABC):
@@ -26,8 +27,8 @@ class DecoratedResourceMixin(Resource, ABC):
         super().__init__()
 
 
-class UserResource(ProxyControllerResourceMixin):
-    _global_proxy_controller_factory = FlaskJSONRequestAdditionalProxyController
+class UserResource(DecoratedResourceMixin):
+    _decorator = decorator_for_addition_data_by(request.json)
 
     get = GetterController(
         UserRepository(db),
