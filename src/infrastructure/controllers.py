@@ -58,26 +58,14 @@ def load_to(schema: Schema, chunk: Iterable) -> reformer_of[Iterable]:
 def call_service(service: Callable, chunk: Iterable) -> Any:
     return service(*data) if is_iterable_but_not_dict(data) else service(**data)
 
-class GetterController(IController):
-    def __init__(self, repository: IRepository, schema: Schema):
-        self.repository = repository
-        self.schema = schema
 
-    def __call__(self, data: Iterable) -> ControllerResponse:
-        received_data = list()
-        non_existent_resource_data = list()
+def search_in(repository: IRepository, query_packs: Iterable[ArgumentPack]) -> Iterable:
+    found_data = list()
+    lost_data = list()
 
-        for data_chunk in data:
-            resource = self.repository.get_by(**data_chunk)
-            
-            (received_data if resource is not None else non_existent_resource_data).append(
-                self.schema.dump(resource, many=False)
-            )
+    for query_pack in query_packs:
+        resource = query_pack.call(self._repository.get_by)
+        
+        (found_data if resource is not None else lost_data).append(resource)
 
-        return ControllerResponse(
-            status_code=(404 if non_existent_resource_data else 200),
-            payload={
-                'received': received_data,
-                'lost': non_existent_resource_data
-            }
-        )
+    return SearchResult(found=tuple(found_data), lost=tuple(lost_data))
