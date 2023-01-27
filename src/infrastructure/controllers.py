@@ -37,6 +37,9 @@ class ProxyController(IController):
         )
 
 
+class SearchResult(TypedDict):
+    found: Iterable = tuple()
+    lost: Iterable = tuple()
 
 
 def load_to(schema: Schema, chunk: Iterable) -> reformer_of[Iterable]:
