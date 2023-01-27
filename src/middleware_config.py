@@ -1,4 +1,6 @@
-from flask import jsonify, abort
+from functools import partial
+
+from flask import jsonify, abort, redirect
 from flask_middlewares import DecoratorMiddleware
 from flask_middlewares.tools import get_status_code_from, StatusCodeGroup
 from pyhandling import *
