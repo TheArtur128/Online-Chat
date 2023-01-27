@@ -2,7 +2,6 @@ from abc import ABC
 from typing import Iterable, Callable
 
 from flask_restful import Resource
-from flask_middlewares import MiddlewareKeeper, Middleware
 
 from frameworks.flask import FlaskJSONRequestAdditionalProxyController
 from frameworks.repositories import UserRepository
@@ -10,24 +9,6 @@ from frameworks.schemes import UserSchema
 from infrastructure.controllers import IController, SchemaDataCleanerProxyController, ServiceController, GetterController
 from services.authorization import AccountRegistrar
 from orm import db
-
-
-class MiddlewareResourceMixin(MiddlewareKeeper, Resource, ABC):
-    _internal_middlewares: Iterable[Middleware]
-
-    def __init__(self, *args, **kwargs):
-        super().__init__()
-
-        for method_name in self.methods:
-            method_name = method_name.lower()
-
-            setattr(
-                self,
-                method_name,
-                self._proxy_middleware.decorate(getattr(self, method_name))
-            )
-
-        super(Resource, self).__init__()
 
 
 class ProxyControllerResourceMixin(Resource, ABC):
