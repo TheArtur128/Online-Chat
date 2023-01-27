@@ -11,7 +11,7 @@ from orm import db
 from services.tokens import TokenPromiser
 from tools.errors import DocumentaryError
 from tools.formatters import convert_documentary_error_to_dict
-from tools.utils import get_status_code_from_error, post_action_decorator
+from tools.utils import get_status_code_from_error
 
 
 IS_GLOBAL_MIDDLEWARES_HIGHER = False
@@ -39,7 +39,7 @@ GLOBAL_MIDDLEWARES = (
     DecoratorMiddleware(
         mergely(
             take(rollbackable),
-            db.session.commit >= eventually |then>> returnly |then>> post_action_decorator
+            db.session.commit >= eventually |then>> returnly |then>> next_action_decorator_of,
             db.session.rollback >= eventually |then>> returnly |then>> take
         )
     ),
@@ -73,14 +73,14 @@ MIDDLEWARE_ENVIRONMENTS = {
         'USE_FOR_BLUEPRINT': True,
         'IS_GLOBAL_MIDDLEWARES_HIGHER': False,
         'MIDDLEWARES': (
-            DecoratorMiddleware(post_action_decorator(
+            DecoratorMiddleware(next_action_decorator_of(
                 get_status_code_from
                 |then>> on_condition(
                     post_partial(execute_operation, 'in', StatusCodeGroup.ERROR),
                     abort
                 )
             )),
-            DecoratorMiddleware(post_action_decorator(
+            DecoratorMiddleware(next_action_decorator_of(
                 get_status_code_from
                 |then>> on_condition(
                     post_partial(execute_operation, '==', 403),
