@@ -44,3 +44,5 @@ class ReportingError(DecoratorError):
         )
 
 
+class InputDataCorrectionError(ReportingError):
+    pass
