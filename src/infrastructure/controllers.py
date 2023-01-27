@@ -47,30 +47,13 @@ def load_to(schema: Schema, chunk: Iterable) -> reformer_of[Iterable]:
                 partial(ReportingError, ValueError("Incorect input data"))
                 |then>> raise_
             )
-
-
-class ServiceController(IController):
-    def __init__(
-        self,
-        service: Callable,
-        *,
-        is_service_input_multiple: bool = False,
-        response_factory: Callable[[any, int, dict], ControllerResponse] = ControllerResponse
-    ):
-        self.service = service
-        self.is_service_input_multiple = is_service_input_multiple
-        self.response_factory = response_factory
-
-    def __call__(self, data: Iterable) -> ControllerResponse:
-        return self.response_factory(
-            tuple(map(self._call_service_by, data))
-            if self._is_service_input_multiple
-            else self._call_service_by(data)
         )
+        |then>> schema.dump
+    )
 
-    def _call_service_by(self, data: Iterable) -> any:
-        return self._service(*data) if is_iterable_but_not_dict(data) else self._service(**data)
 
+def call_service(service: Callable, chunk: Iterable) -> Any:
+    return service(*data) if is_iterable_but_not_dict(data) else service(**data)
 
 class GetterController(IController):
     def __init__(self, repository: IRepository, schema: Schema):
