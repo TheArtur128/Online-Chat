@@ -70,3 +70,10 @@ def is_iterable_but_not_dict(data: any) -> bool:
 
 
 post_action_decorator: decorator = ActionChain(call).clone_with |then>> close
+def dict_value_map(value_transformer: handler, dict_: dict) -> dict:
+    return {
+        _: value_transformer(value)
+        for _, value in dict_.items()
+    }
+
+
