@@ -1,13 +1,13 @@
 from flask import jsonify, abort
 from flask_middlewares import DecoratorMiddleware
 from flask_middlewares.tools import get_status_code_from, StatusCodeGroup
+from pyhandling import *
 
 from config import DEFAULT_JWT_SERIALIZATOR_FACTORY
 from frameworks.flask import get_flask_response_by_controller_response, FlaskAccessTokenGetter
 from infrastructure.errors import ResorceError, AccessTokenInvalidError
 from infrastructure.middlewares import AccessTokenRequiredMiddleware
 from orm import db
-from pyhandling import *
 from services.tokens import TokenPromiser
 from tools.errors import DocumentaryError
 from tools.formatters import convert_documentary_error_to_dict
