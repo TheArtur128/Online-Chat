@@ -92,3 +92,7 @@ def combine_data_chunks(first_chunk: Iterable, second_chunk: Iterable) -> Iterab
         )
 
 
+decorator_for_addition_data_by = (
+    mergely(take(mergely), take(close(combine_data_chunks)), second_chunk=return_)
+    |then>> previous_action_decorator_of
+)
