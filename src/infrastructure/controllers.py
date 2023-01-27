@@ -37,21 +37,16 @@ class ProxyController(IController):
         )
 
 
-class SchemaDataCleanerProxyController(ProxyController):
-    def __init__(self, controller: IController, schema: Schema):
-        super().__init__(controller)
-        self.schema = schema
 
-    def __call__(self, data: Iterable) -> ControllerResponse:
-        error_reports = self._schema.validate(data)
 
-        if error_reports:
-            raise InputControllerDataCorrectionError(
-                "Incorect input controller data",
-                error_reports
+def load_to(schema: Schema, chunk: Iterable) -> reformer_of[Iterable]:
+    return chunk >= (
+        returnly(
+            schema.validate
+            |then>> partial(on_condition, bool)(
+                partial(ReportingError, ValueError("Incorect input data"))
+                |then>> raise_
             )
-
-        return super().__call__(self._schema.dump(data))
 
 
 class ServiceController(IController):
