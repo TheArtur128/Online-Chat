@@ -82,7 +82,7 @@ MIDDLEWARE_ENVIRONMENTS = {
             DecoratorMiddleware(next_action_decorator_of(
                 get_status_code_from
                 |then>> on_condition(
-                    post_partial(execute_operation, '==', 403),
+                    operation_by('==', 403),
                     "views.authorization" >= close(redirect) |then>> eventually
                 )
             ))
