@@ -6,15 +6,10 @@ from tools.errors import ReportingError
 def convert_error_report_to_dict(
     report: ReportingError,
     *,
-    is_converting_error_type_name: bool = True,
     is_converting_error_message: bool = True,
     is_converting_error_detail: bool = True
 ) -> dict:
-    result_dict = (
-        {'error-type': type(report.error).__name__}
-        if is_converting_error_type_name
-        else dict()
-    )
+    result_dict = dict()
 
     if error.message and is_converting_error_message:
         result_dict['message'] = str(report.error)
