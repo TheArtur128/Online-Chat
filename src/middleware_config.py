@@ -81,7 +81,7 @@ MIDDLEWARE_ENVIRONMENTS = {
                     operation_by('==', 403),
                     "views.authorization" >= close(redirect) |then>> eventually
                 )
-            ))
+            )),
         )
     }
 }
