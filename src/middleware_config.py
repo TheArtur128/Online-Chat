@@ -20,25 +20,21 @@ IS_GLOBAL_MIDDLEWARES_HIGHER = False
 
 GLOBAL_MIDDLEWARES = (
     get_flask_response_by_controller_response >= next_action_decorator_of |then>> DecoratorMiddleware,
-    DecoratorMiddleware(
-        close(rollbackable, closer=post_partial)(
-            on_condition(
-                post_partial(isinstance, AccessTokenInvalidError),
-                mergely(
-                    take(dict |then>> jsonify),
-                    message=str,
-                    status_code=get_status_code_from_error
-                ),
-                else_=raise_
-            )
+    close(rollbackable, closer=post_partial)(
+        on_condition(
+            isinstance |by| AccessTokenInvalidError,
+            mergely(
+                json_response_of,
+                message=str,
+                status_code=get_status_code_from_error
+            ),
+            else_=raise_
         )
     ),
-    DecoratorMiddleware(
-        mergely(
-            take(rollbackable),
-            db.session.commit >= eventually |then>> returnly |then>> next_action_decorator_of,
-            db.session.rollback >= eventually |then>> returnly |then>> take
-        )
+    mergely(
+        take(rollbackable),
+        db.session.commit >= eventually |then>> returnly |then>> next_action_decorator_of,
+        db.session.rollback >= eventually |then>> returnly |then>> take
     ),
     AccessTokenRequiredMiddleware(
         TokenPromiser(DEFAULT_JWT_SERIALIZATOR_FACTORY()),
@@ -53,7 +49,7 @@ MIDDLEWARE_ENVIRONMENTS = {
         'USE_FOR_BLUEPRINT': True,
         'IS_GLOBAL_MIDDLEWARES_HIGHER': False,
         'MIDDLEWARES': (
-            DecoratorMiddleware(
+            (
                 mergely(
                     take(json_response_of),
                     on_condition(
@@ -72,14 +68,14 @@ MIDDLEWARE_ENVIRONMENTS = {
         'USE_FOR_BLUEPRINT': True,
         'IS_GLOBAL_MIDDLEWARES_HIGHER': False,
         'MIDDLEWARES': (
-            DecoratorMiddleware(next_action_decorator_of(
+            next_action_decorator_of(returnly(
                 get_status_code_from
                 |then>> on_condition(
                     post_partial(execute_operation, 'in', StatusCodeGroup.ERROR),
                     abort
                 )
             )),
-            DecoratorMiddleware(next_action_decorator_of(
+            next_action_decorator_of(returnly(
                 get_status_code_from
                 |then>> on_condition(
                     operation_by('==', 403),
