@@ -46,6 +46,8 @@ GLOBAL_MIDDLEWARES = (
     )
 )
 
+json_response_of = dict |then>> jsonify
+
 MIDDLEWARE_ENVIRONMENTS = {
     'api': {
         'USE_FOR_BLUEPRINT': True,
@@ -53,7 +55,7 @@ MIDDLEWARE_ENVIRONMENTS = {
         'MIDDLEWARES': (
             DecoratorMiddleware(
                 mergely(
-                    take(dict |then>> jsonify),
+                    take(json_response_of),
                     on_condition(
                         post_partial(isinstance, DocumentaryError),
                         convert_documentary_error_to_dict,
