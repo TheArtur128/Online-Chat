@@ -57,13 +57,13 @@ MIDDLEWARE_ENVIRONMENTS = {
                 mergely(
                     take(json_response_of),
                     on_condition(
-                        post_partial(isinstance, DocumentaryError),
+                        isinstance |by| DocumentaryError,
                         convert_documentary_error_to_dict,
                         else_=mergely(take(dict), message=str)
                     ),
                     status_code=get_status_code_from_error
                 )
-                >= partial(on_condition, post_partial(isinstance, ResorceError), else_=raise_)
+                >= partial(on_condition, isinstance |by| ResorceError, else_=raise_)
                 |then>> close(rollbackable, closer=post_partial)
             ),
         )
