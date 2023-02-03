@@ -8,7 +8,7 @@ from views import view_blueprint
 
 
 app = Flask(__name__)
-app.config.from_object('config')
+app.config.from_object("config")
 
 app.register_blueprint(api_blueprint, url_prefix='/api')
 app.register_blueprint(view_blueprint)
@@ -18,9 +18,9 @@ db.init_app(app)
 migrate = Migrate(app, db)
 
 middleware_config = Config(str())
-middleware_config.from_object('middleware_config')
+middleware_config.from_object("middlewares.config")
 
 ProxyFlaskAppMiddlewareRegistrar.create_from_config(middleware_config).init_app(app)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run(port='8048')
