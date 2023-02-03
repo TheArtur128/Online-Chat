@@ -11,22 +11,8 @@ from orm import db
 from tools.errors import StatusCodeError
 
 
-@dataclass(frozen=True)
-class ASCIIRange:
-    start: int = 0
-    end: int = 127
-    step: int = 1
-
-    def __post_init__(self):
-        if self.step == 0:
-            raise ValueError("step must not be zero")
-
-    def __iter__(self) -> iter:
-        return iter(
-            (chr(symbol_index) for symbol_index in range(self.start, self.end, self.step))
-        )
-
-
+def ascii_range_as(range_: range) -> Generator[str, None, None]:
+    return chr(symbol_index) for symbol_index in range_
 
 
 def get_time_after(minutes: int, is_time_raw: bool = False) -> datetime | float:
