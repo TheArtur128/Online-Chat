@@ -18,9 +18,5 @@ class TokenError(ServiceError):
     pass
 
 
-class MissingTokenError(TokenError):
-    pass
-
-
-class InvalidTokenError(TokenError):
+class AccessTokenError(TokenError):
     pass
