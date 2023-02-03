@@ -1,10 +1,10 @@
-from services.tokens import ITokenSerializator, TokenDecoderResult
+from services.tokens import TokenDecoderResult
 
 from jwt import encode, decode, InvalidTokenError
 from datetime import datetime
 
 
-class JWTSerializator(ITokenSerializator):
+class JWTSerializator:
     def __init__(self, key: str, is_symmetric: bool = True, leeway: int | float = 0):
         self.key = key
         self.is_symmetric = is_symmetric
