@@ -11,16 +11,6 @@ from tools.errors import ReportingError
 from tools.utils import is_iterable_but_not_dict
 
 
-controller = factory_for[ControllerResponse]
-
-
-@dataclass(frozen=True)
-class ControllerResponse:
-    payload: any
-    status_code: int = 200
-    metadata: dict = field(default_factory=dict)
-
-
 class SearchResult(TypedDict):
     found: Iterable = tuple()
     lost: Iterable = tuple()
