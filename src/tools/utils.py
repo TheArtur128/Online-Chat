@@ -66,3 +66,6 @@ decorator_for_addition_data_by = (
     mergely(take(mergely), take(close(combine_data_chunks)), second_chunk=return_)
     |then>> previous_action_decorator_of
 )
+
+
+event_decorator = close(merge |then>> next_action_decorator_of(getitem_of |by| -1))
