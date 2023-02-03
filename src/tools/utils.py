@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Iterable
+from typing import Iterable, Callable, Tuple
 
 from beautiful_repr import StylizedMixin, Field, TemplateFormatter
 from marshmallow.validate import Length
@@ -53,6 +53,13 @@ def combine_data_chunks(first_chunk: Iterable, second_chunk: Iterable) -> Iterab
                 second_chunk_type=type(second_chunk).__name__
             )
         )
+
+
+def merge(*funcs: Callable) -> Callable:
+    def merged(*args, **kwargs) -> Tuple:
+        return tuple(func(*args, **kwargs) for func in funcs)
+
+    return merged
 
 
 decorator_for_addition_data_by = (
