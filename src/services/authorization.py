@@ -1,4 +1,4 @@
-from abc import ABC
+from typing import Protocol, runtime_checkable
 
 from services.errors import AccountAlreadyExistsError
 from services.repositories import Repository
@@ -6,7 +6,8 @@ from services.tokens import ITokenCoder
 from tools.utils import get_time_after
 
 
-class Account(ABC):
+@runtime_checkable
+class Account(Protocol):
     url_token: str
 
 
