@@ -20,14 +20,10 @@ def register_account(account: Account, repository: IRepository[Account]) -> None
     repository.add(account)
 
 
-
-class AccountTokenFactory:
-    def __init__(self, token_coder: ITokenCoder, life_minutes: int | float):
-        self.token_coder = token_coder
-        self.life_minutes = life_minutes
-
-    def __call__(self, account: Account) -> str:
-        return self.token_coder.encode({
-            'url_token': account.url_token,
-            'exp': get_time_after(self.life_minutes, is_time_raw=True)
-        })
+def create_token_for(account: Account, coder: token_coder, life_minutes: int | float) -> str:
+    return coder(
+        dict(
+            url_token=account.url_token,
+            exp=get_time_after(life_minutes, is_time_raw=True)
+        )
+    )
