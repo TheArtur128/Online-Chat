@@ -1,8 +1,8 @@
 from typing import Protocol, runtime_checkable
 
 from services.errors import AccountAlreadyExistsError
-from services.repositories import Repository
-from services.tokens import ITokenCoder
+from services.repositories import IRepository
+from services.tokens import token_coder
 from tools.utils import get_time_after
 
 
@@ -11,17 +11,14 @@ class Account(Protocol):
     url_token: str
 
 
-class AccountRegistrar:
-    def __init__(self, account_repository: Repository[Account]):
-        self.account_repository = account_repository
+def register_account(account: Account, repository: IRepository[Account]) -> None:
+    if repository.get_by(url_token=account.url_token) is not None:
+        raise AccountAlreadyExistsError(
+            f"Account with \"{account.url_token}\" url token already exists"
+        )
 
-    def __call__(self, account: Account) -> None:
-        if self.account_repository.get_by(url_token=account.url_token) is not None:
-            raise AccountAlreadyExistsError(
-                f"Account with \"{account.url_token}\" url token already exists"
-            )
+    repository.add(account)
 
-        self.account_repository.add(account)
 
 
 class AccountTokenFactory:
