@@ -10,9 +10,6 @@ class UserSession(db.Model):
     token = db.Column(db.String(512), nullable=False)
     cancellation_time = db.Column(db.DateTime, nullable=False)
 
-    @property
-    def is_valid(self) -> bool:
-        return datetime.now() < self.cancellation_time
 
 
 class User(_FormattedUrlModelMixin, db.Model):
