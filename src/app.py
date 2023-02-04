@@ -1,6 +1,7 @@
 from flask import Flask, Config
 from flask_middlewares import MultipleMiddlewareRegistrar
 from flask_migrate import Migrate
+from flask_pack import config_from
 
 from api import api_blueprint
 from orm import db
@@ -16,8 +17,7 @@ app.register_blueprint(view_blueprint)
 db.init_app(app)
 migrate = Migrate(app, db)
 
-middleware_config = Config(str())
-middleware_config.from_object("middlewares.config")
+middleware_config = config_from("middlewares.config")
 
 MultipleMiddlewareRegistrar.from_config(middleware_config).init_app(app)
 
