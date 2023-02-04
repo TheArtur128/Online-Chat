@@ -11,20 +11,18 @@ from orm.models import User
 
 
 class SQLAlchemyRepository(MonolithicRepository):
-    _sqlalchemy_model: db.Model
-
     def __init__(self, model: db.Model, session: SQLAlchemy):
         self._model = model
         self._session = session
 
     def all(self) -> Iterable[db.Model]:
-        return self._sqlalchemy_model.query.all()
+        return self._model.query.all()
 
     def add(self, instance: db.Model) -> None:
-        self._sqlalchemy_model.add(instance)
+        self._model.add(instance)
 
     def remove(self, instance: db.Model) -> None:
-        self._sqlalchemy_model.delete(instance)
+        self._model.delete(instance)
 
     def _get_by_conditions(
         self,
@@ -38,7 +36,7 @@ class SQLAlchemyRepository(MonolithicRepository):
                 condition, attribute_name
             ))
 
-        objects = self._sqlalchemy_model.query.filter(*sqlalchemy_conditions)
+        objects = self._model.query.filter(*sqlalchemy_conditions)
 
         return objects.all() if is_many else objects.first()
 
@@ -51,7 +49,7 @@ class SQLAlchemyRepository(MonolithicRepository):
         conditions: Iterable[SearchAnnotation | object],
         attribute_name: str
     ) -> Iterable[BinaryExpression]:
-        model_attribute = getattr(self._sqlalchemy_model, attribute_name)
+        model_attribute = getattr(self._model, attribute_name)
         sqlalchemy_conditions = list()
 
         for condition in conditions:
