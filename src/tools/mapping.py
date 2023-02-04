@@ -1,4 +1,5 @@
-from typing import Final, Tuple, Iterable, Optional, Any, Callable
+from dataclasses import dataclass
+from typing import Final, Tuple, Iterable, Optional, Any, Callable, TypeVar
 
 from pyannotating import AnnotationTemplate, input_annotation
 from pyhandling import returnly, by, return_, then, mergely, take, close, post_partial, event_as, raise_, on_condition
@@ -52,3 +53,12 @@ def setting_of(attribute_name: str) -> attribute_setter:
         return setattr(object_, attribute_name, value)
 
     return wrapper
+
+
+attribute_owner = TypeVar("attribute_owner")
+
+
+@dataclass(frozen=True)
+class AttributeMap(Generic[attribute_owner]):
+    getter: attribute_getter_of[attribute_owner]
+    setter: attribute_setter_of[attribute_owner]
