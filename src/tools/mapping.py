@@ -1,6 +1,7 @@
 from typing import Final, Tuple, Iterable, Optional, Any, Callable
 
 from pyannotating import AnnotationTemplate, input_annotation
+from pyhandling import returnly, by, return_, then, mergely, take, close, post_partial, event_as, raise_, on_condition
 from pyhandling.annotations import dirty, reformer_of, handler, handler_of
 
 
@@ -21,6 +22,18 @@ _MAGIC_METHODS_NAMES: Final[Tuple[str]] = (
     "__mul__", "__floordiv__", "__truediv__", "__mod__", "__pow__", "__lt__",
     "__le__", "__eq__", "__ne__", "__ge__"
 )
+
+
+def method_proxies_to_attribute(attribute_name: str, method_names: Iterable[str]) -> dirty[reformer_of[type]]:
+    @returnly
+    def decorator(type_: type, attribute_name: str) -> type:
+        if attribute_name[:2] == '__':
+            attribute_name = f"_{type_.__name__}{attribute_name}"
+
+        for methods_name in method_names:
+            _proxy_method_to_attribute(attribute_name, methods_name, type_)
+
+    return decorator |by| attribute_name
 
 
 def _proxy_method_to_attribute(attribute_name: str, method_name: str, type_: type) -> None:
