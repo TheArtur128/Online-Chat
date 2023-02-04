@@ -81,6 +81,7 @@ property_attribute_map: Callable[[attribute_getter], AttributeMap] = (
 mapped = TypeVar("mapped")
 
 
+@method_proxies_to_attribute("__mapped", set(_MAGIC_METHODS_NAMES) - {"__repr__", "__str__"})
 class AttributeMapper(Generic[mapped]):
     def __init__(
         self,
