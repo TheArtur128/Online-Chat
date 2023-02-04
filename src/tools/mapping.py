@@ -69,3 +69,8 @@ attribute_map_for: Callable[[str], AttributeMap] = mergely(
     close(getattr, closer=post_partial),
     setting_of
 )
+
+
+property_attribute_map: Callable[[attribute_getter], AttributeMap] = (
+    AttributeMap |by| event_as(raise_, AttributeError("Attribute cannot be set"))
+)
