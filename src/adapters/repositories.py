@@ -14,8 +14,8 @@ class SQLAlchemyRepository(MonolithicRepository):
     _sqlalchemy_model: db.Model
 
     def __init__(self, model: db.Model, session: SQLAlchemy):
-        self.model = model
-        self.session = session
+        self._model = model
+        self._session = session
 
     def all(self) -> Iterable[db.Model]:
         return self._sqlalchemy_model.query.all()
