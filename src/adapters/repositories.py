@@ -20,10 +20,6 @@ class SQLAlchemyRepository(MonolithicRepository):
     def all(self) -> Iterable[db.Model]:
         return self._sqlalchemy_model.query.all()
 
-    @property
-    def supported_storage_types(self) -> tuple[db.Model]:
-        return (self._sqlalchemy_model, )
-
     def add(self, instance: db.Model) -> None:
         self._sqlalchemy_model.add(instance)
 
