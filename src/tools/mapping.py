@@ -45,3 +45,10 @@ def _proxy_method_to_attribute(attribute_name: str, method_name: str, type_: typ
         method_name,
         method_wrapper
     )
+
+
+def setting_of(attribute_name: str) -> attribute_setter:
+    def wrapper(object_: object, value: Any) -> Any:
+        return setattr(object_, attribute_name, value)
+
+    return wrapper
