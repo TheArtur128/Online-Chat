@@ -21,3 +21,14 @@ _MAGIC_METHODS_NAMES: Final[Tuple[str]] = (
     "__mul__", "__floordiv__", "__truediv__", "__mod__", "__pow__", "__lt__",
     "__le__", "__eq__", "__ne__", "__ge__"
 )
+
+
+def _proxy_method_to_attribute(attribute_name: str, method_name: str, type_: type) -> None:
+    def method_wrapper(instance: object, *args, **kwargs):
+        return getattr(getattr(instance, attribute_name), method_name)(*args, **kwargs)
+
+    setattr(
+        type_,
+        method_name,
+        method_wrapper
+    )
