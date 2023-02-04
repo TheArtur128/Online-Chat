@@ -62,3 +62,10 @@ attribute_owner = TypeVar("attribute_owner")
 class AttributeMap(Generic[attribute_owner]):
     getter: attribute_getter_of[attribute_owner]
     setter: attribute_setter_of[attribute_owner]
+
+
+attribute_map_for: Callable[[str], AttributeMap] = mergely(
+    take(AttributeMap),
+    close(getattr, closer=post_partial),
+    setting_of
+)
