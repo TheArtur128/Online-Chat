@@ -84,7 +84,4 @@ class SQLAlchemyRepository(MonolithicRepository):
                 ))
 
         return sqlalchemy_conditions
-
-
-class UserRepository(SQLAlchemyRepository):
-    _sqlalchemy_model = User
+        return sqlalchemy_conditions
