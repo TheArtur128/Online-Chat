@@ -5,6 +5,8 @@ from pyannotating import AnnotationTemplate, input_annotation
 from pyhandling import returnly, by, return_, then, mergely, take, close, post_partial, event_as, raise_, on_condition
 from pyhandling.annotations import dirty, reformer_of, handler, handler_of
 
+from tools.utils import dict_value_map
+
 
 attribute_getter_of = handler_of
 attribute_setter_of = AnnotationTemplate(Callable, [[input_annotation, Any], Any])
@@ -74,3 +76,61 @@ attribute_map_for: Callable[[str], AttributeMap] = mergely(
 property_attribute_map: Callable[[attribute_getter], AttributeMap] = (
     AttributeMap |by| event_as(raise_, AttributeError("Attribute cannot be set"))
 )
+
+
+mapped = TypeVar("mapped")
+
+
+class AttributeMapper(Generic[mapped]):
+    def __init__(
+        self,
+        mapped: mapped,
+        **attribute_map_by_virtual_attribute_name: str | AttributeMap[mapped] | attribute_getter_of[mapped]
+    ):
+        self.__mapped = mapped
+        self.__attribute_map_by_virtual_attribute_name = dict_value_map(
+            self.__convert_attribute_map_resource_to_attribute_map,
+            attribute_map_by_virtual_attribute_name
+        )
+
+    def __repr__(self) -> str:
+        return f"Mapped {self.__mapped}"
+
+    def __getattribute__(self, attribute_name: str) -> Any:
+        self.__validate_availability_for(attribute_name)
+
+        if attribute_name[:1] == '_':
+            return object.__getattribute__(self, attribute_name)
+
+        return self.__attribute_map_by_virtual_attribute_name[attribute_name].getter(
+            self.__mapped,
+            attribute_name
+        )
+
+    def __setattr__(self, attribute_name: str, attribute_value: Any) -> Any:
+        self.__validate_availability_for(attribute_name)
+
+        if attribute_name[:1] == '_':
+            super().__setattr__(attribute_name, attribute_value)
+        else:
+            return self.__attribute_map_by_virtual_attribute_name[attribute_name].setter(
+                self.__mapped,
+                attribute_value
+            )
+
+    def __validate_availability_for(self, attribute_name: str) -> None:
+        if attribute_name not in self.__attribute_map_by_virtual_attribute_name.keys():
+            raise AttributeError(
+                f"Attribute \"{attribute_name}\" is not allowed in AttributeMapper for {self.__mapped}"
+            )
+
+    @staticmethod
+    def __convert_attribute_map_resource_to_attribute_map(
+        attribute_map_resource: str | AttributeMap[mapped] | attribute_getter_of[mapped]
+    ) -> AttributeMap[mapped]:
+        if isinstance(attribute_map_resource, AttributeMap[mapped]):
+            return attribute_map_resource
+        elif callable(attribute_map_resource):
+            return property_attribute_map(attribute_map_resource)
+        else:
+            return attribute_map_for(attribute_map_resource)
