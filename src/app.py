@@ -14,7 +14,6 @@ app.register_blueprint(api_blueprint, url_prefix='/api')
 app.register_blueprint(view_blueprint)
 
 db.init_app(app)
-
 migrate = Migrate(app, db)
 
 middleware_config = Config(str())
