@@ -7,9 +7,11 @@ class UserSession(db.Model):
     __tablename__ ='user_sessions'
 
     id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey(UserSession.id), unique=True)
     token = db.Column(db.String(512), nullable=False)
     cancellation_time = db.Column(db.DateTime, nullable=False)
 
+    user = db.relationship("User", foreign_keys=(user_id, ))
 
 
 class User(db.Model):
