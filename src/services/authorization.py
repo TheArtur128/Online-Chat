@@ -8,6 +8,8 @@ from tools.utils import get_time_after
 
 @runtime_checkable
 
+
+@runtime_checkable
 class Profile(Protocol):
     token: str
 
@@ -15,6 +17,8 @@ def register_account(account: Account, repository: IRepository[Account]) -> None
     if repository.get_by(url_token=account.url_token) is not None:
         raise AccountAlreadyExistsError(
             f"Account with \"{account.url_token}\" url token already exists"
+
+@runtime_checkable
 class Account(Protocol):
     profile: Profile
         )
