@@ -11,6 +11,10 @@ from orm import db
 from tools.errors import StatusCodeError
 
 
+def length_validator_by_column(column: str, model: db.Model) -> Length:
+    return Length(max=getattr(model, column).comparator.type.length)
+
+
 def ascii_range_as(range_: range) -> Generator[str, None, None]:
     return chr(symbol_index) for symbol_index in range_
 
