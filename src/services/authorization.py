@@ -7,6 +7,8 @@ from tools.utils import get_time_after
 
 
 @runtime_checkable
+class Session(Protocol):
+    cancellation_time: datetime
 
 
 @runtime_checkable
@@ -21,6 +23,7 @@ def register_account(account: Account, repository: IRepository[Account]) -> None
 @runtime_checkable
 class Account(Protocol):
     profile: Profile
+    session: Session
         )
 
     repository.add(account)
