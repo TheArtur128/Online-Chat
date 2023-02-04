@@ -1,13 +1,12 @@
-from abc import ABC
-from typing import Optional, Iterable, Callable
+from typing import Iterable, Optional, Callable
 
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 from sqlalchemy.sql.expression import BinaryExpression, and_, or_, not_
 
-from services.repositories import Repository, SearchAnnotation, GroupingAnnotation, Equal, Greater, Lesser, And, Or, Not
+from services.repositories import Repository
+from services.repositories.search_annotations import *
 from orm import db
-from orm.models import User
 
 
 class SQLAlchemyRepository(MonolithicRepository):
