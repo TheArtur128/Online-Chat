@@ -73,3 +73,12 @@ decorator_for_addition_data_by = (
 
 
 event_decorator = close(merge |then>> next_action_decorator_of(getitem_of |by| -1))
+
+
+swap_keys_and_values: reformer_of[dict] = documenting_by(
+    """Function to get dict with swaped keys and values."""
+)(
+    (callmethod |by| "items")
+    |then>> close(map)(getitem_of |by| slice(1, 1, -1))
+    |then>> dict
+)
