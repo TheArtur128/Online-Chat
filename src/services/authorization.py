@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Protocol, runtime_checkable
 
 from services.errors import RegistrationError
@@ -45,4 +46,8 @@ def create_token_for(account: Account, coder: token_coder, life_minutes: int | f
             token=account.token,
             exp=get_time_after(life_minutes, is_time_raw=True)
         )
+    )
 
+
+def is_session_valid(session: Session) -> bool:
+    return datetime.now() < session.cancellation_time
