@@ -84,4 +84,3 @@ class SQLAlchemyRepository(MonolithicRepository):
                 ))
 
         return sqlalchemy_conditions
-        return sqlalchemy_conditions
