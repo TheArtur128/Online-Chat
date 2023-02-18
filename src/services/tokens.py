@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Callable, Optional
 from enum import Enum, auto
 
 from services.errors import AccessTokenError
