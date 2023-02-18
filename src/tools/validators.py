@@ -4,7 +4,7 @@ from marshmallow import ValidationError
 from pyhandling import DelegatingProperty
 
 
-class CharacterAttribute:
+class _CharacterAttribute:
     characters = DelegatingProperty("__characters", settable=True, setting_converter=frozenset)
 
     def __init__(self, characters: Iterable[str]):
@@ -19,8 +19,8 @@ class CharacterAttribute:
 
 class CharactersValidator:
     def __init__(self, extra_characters: Iterable[str] = tuple(), allowable_characters: Iterable[str] = tuple(), line_name='The line'):
-        self.extra_characters = CharacterAttribute(extra_characters)
-        self.allowable_characters = CharacterAttribute(allowable_characters)
+        self.extra_characters = _CharacterAttribute(extra_characters)
+        self.allowable_characters = _CharacterAttribute(allowable_characters)
         self.line_name = line_name
 
     def __call__(self, line: str) -> None:
