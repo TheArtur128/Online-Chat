@@ -17,7 +17,7 @@ def redirect_on_status_code_that(status_code_checker: checker_of[int], url_to_re
     )
 
 
-require_access_token_by: decorator = event_decorator(
+require_access_token: decorator = event_decorator(
     take(request.headers)
     |then>> (callmethod |by| 'get')
     |then>> (validate_access_token |by| JWTSerializator())
