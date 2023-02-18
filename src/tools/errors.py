@@ -44,5 +44,22 @@ class ReportingError(DecoratorError):
         )
 
 
+def convert_error_report_to_dict(
+    report: ErrorReport,
+    *,
+    is_converting_error_message: bool = True,
+    is_converting_error_detail: bool = True
+) -> dict:
+    result_dict = dict()
+
+    if error.message and is_converting_error_message:
+        result_dict['message'] = str(report.error)
+
+    if error.document and is_converting_error_detail:
+        result_dict['detail'] = report.document
+
+    return result_dict
+
+
 class InputDataCorrectionError(ReportingError):
     pass
