@@ -4,11 +4,6 @@ from secrets import token_hex
 
 from dotenv import load_dotenv
 
-from frameworks.factories import CustomMinuteUserSessionFactory
-from frameworks.jwt_serializers import JWTSerializator
-from services.authorization import AccountTokenFactory
-from orm.models import UserSession
-
 
 load_dotenv()
 
@@ -31,16 +26,3 @@ SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 ACCESS_TOKEN_LIFE_MINUTES = 15
 REFRESH_TOKEN_LIFE_DAYS = 30
-
-
-DEFAULT_JWT_SERIALIZATOR_FACTORY = partial(JWTSerializator, SECRET_KEY)
-
-ACCESS_TOKEN_FACTORY = AccountTokenFactory(
-    DEFAULT_JWT_SERIALIZATOR_FACTORY(),
-    ACCESS_TOKEN_LIFE_MINUTES
-)
-
-DEFAULT_USER_SESSION_FACTORY = CustomMinuteUserSessionFactory(
-    REFRESH_TOKEN_LIFE_DAYS*24*60,
-    partial(token_hex, UserSession.token.comparator.type.length // 2)
-)
