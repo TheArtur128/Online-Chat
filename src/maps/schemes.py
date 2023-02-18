@@ -38,3 +38,9 @@ class UserSchema(Schema):
         dump_only=True,
         error_messages={"required": "Password is required."}
     )
+
+
+user_schema_without_passwords = partial(
+    UserSchema,
+    exclude=('password', 'password_hash')
+)
