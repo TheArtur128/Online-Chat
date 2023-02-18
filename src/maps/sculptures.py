@@ -22,3 +22,10 @@ account_sculture_from: Callable[[User], Account] = close(Sculture)(
     profile=profile_sculture_from_user,
     session=(getattr |by| "session") |then>> session_mapper_for 
 )
+
+
+OriginalT = TypeVar("OriginalT")
+
+original_from: Callable[[Sculture[OriginalT]], OriginalT] = (
+    getattr |by| "_Sculpture__original"
+)
