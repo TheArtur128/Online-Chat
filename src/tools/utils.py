@@ -66,7 +66,7 @@ def merge(*funcs: Callable) -> Callable:
     return merged
 
 
-decorator_for_addition_data_by = (
+data_additing_decorator_by: Callable[[Callable[[], Iterable]], reformer_of[reformer_of[Iterable]]] = (
     mergely(take(mergely), take(close(combine_data_chunks)), second_chunk=return_)
     |then>> previous_action_decorator_of
 )
