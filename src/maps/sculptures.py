@@ -1,23 +1,24 @@
 from typing import Callable
 
 from pyhandling import close, by, then
+from sculpting import Sculture
 
 from orm.models import User, UserSession
 from services.authorization import Profile, Session, Account
 from tools.mapping import AttributeMapper
 
 
-profile_mapper_for: Callable[[User], Profile] = close(AttributeMapper)(
+profile_sculture_from: Callable[[User], Profile] = close(Sculture)(
     token="url_token"
 )
 
 
-session_mapper_for: Callable[[UserSession], Session] = close(AttributeMapper)(
+session_sculture_from: Callable[[UserSession], Session] = close(Sculture)(
     cancellation_time="cancellation_time"
 )
 
 
-account_mapper_for: Callable[[User], Account] = close(AttributeMapper)(
-    profile=profile_mapping_for,
+account_sculture_from: Callable[[User], Account] = close(Sculture)(
+    profile=profile_sculture_from_user,
     session=(getattr |by| "session") |then>> session_mapper_for 
 )
