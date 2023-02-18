@@ -72,7 +72,9 @@ data_additing_decorator_by: Callable[[Callable[[], Iterable]], reformer_of[refor
 )
 
 
-event_decorator = close(merge |then>> next_action_decorator_of(getitem_of |by| -1))
+merge_events: Callable[[...], Callable] = close(
+    merge |then>> next_action_decorator_of(getitem_of |by| -1)
+)
 
 
 swap_keys_and_values: reformer_of[dict] = documenting_by(
