@@ -12,6 +12,10 @@ class Session(Protocol):
     cancellation_time: datetime
 
 
+def is_session_timed_out(session: Session) -> bool:
+    return datetime.now() < session.cancellation_time
+
+
 @runtime_checkable
 class Profile(Protocol):
     token: str
@@ -49,5 +53,3 @@ def create_token_for(account: Account, coder: token_coder, life_minutes: int | f
     )
 
 
-def is_session_valid(session: Session) -> bool:
-    return datetime.now() < session.cancellation_time
