@@ -16,7 +16,7 @@ class SearchResult(TypedDict):
     lost: Iterable = tuple()
 
 
-def load_to(schema: Schema, chunk: Iterable) -> reformer_of[Iterable]:
+def convert_by(schema: Schema, chunk: Iterable) -> reformer_of[Iterable]:
     return chunk >= (
         returnly(
             schema.validate
