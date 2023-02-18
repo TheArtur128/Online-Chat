@@ -1,19 +1,14 @@
 from typing import Iterable
 
 from marshmallow import ValidationError
+from pyhandling import DelegatingProperty
 
 
 class CharacterAttribute:
+    characters = DelegatingProperty("__characters", settable=True, setting_converter=frozenset)
+
     def __init__(self, characters: Iterable[str]):
         self.characters = characters
-
-    @property
-    def characters(self) -> frozenset[str]:
-        return self.__characters
-
-    @characters.setter
-    def characters(self, characters: Iterable[str]) -> None:
-        self.__characters = frozenset(characters)
 
     def __get__(self, instance: any, owner: any) -> any:
         return self.characters
