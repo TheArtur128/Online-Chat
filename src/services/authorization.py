@@ -18,7 +18,8 @@ def is_session_timed_out(session: Session) -> bool:
 
 @runtime_checkable
 class Profile(Protocol):
-    token: str
+    full_name: str
+    short_name: str
 
 
 @runtime_checkable
@@ -33,9 +34,9 @@ def register_account(
     profile_repository: IRepository[Profile],
     session_validator: checker_of[Session]
 ) -> None:
-    if profile_repository.get_by(token=account.profile.token) is not None:
+    if profile_repository.get_by(full_name=account.profile.full_name) is not None:
         raise RegistrationError(
-            f"{account.profile.name}'s profile already exists"
+            f"{account.profile.full_name}'s profile already exists"
         )
 
     if not session_validator(account.session):
