@@ -1,12 +1,12 @@
 from flask_middlewares.tools import BinarySet
 
-from middlewares import required_access_token, redirect_on_status_code_that
+from middlewares import require_access_token, redirect_on_status_code_that
 
 
 MIDDLEWARE_ENVIRONMENTS = {
     'api': {
         "USE_FOR_BLUEPRINT": True,
-        "MIDDLEWARES": [required_access_token]
+        "MIDDLEWARES": [require_access_token]
     },
     "redirecting": {
         "USE_FOR_BLUEPRINT": "views",
