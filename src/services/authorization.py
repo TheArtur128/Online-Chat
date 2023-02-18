@@ -22,6 +22,15 @@ class Profile(Protocol):
     short_name: str
 
 
+def token_for(profile: Profile, coder: token_coder, life_minutes: int | float) -> str:
+    return coder(
+        dict(
+            token=profile.full_name,
+            exp=get_time_after(life_minutes, is_time_raw=True)
+        )
+    )
+
+
 @runtime_checkable
 class Account(Protocol):
     profile: Profile
@@ -43,14 +52,3 @@ def register_account(
         raise RegistrationError(f"Session for {account.profile.name}'s account is invalid")
 
     account_repository.add(account)
-
-
-def create_token_for(account: Account, coder: token_coder, life_minutes: int | float) -> str:
-    return coder(
-        dict(
-            token=account.token,
-            exp=get_time_after(life_minutes, is_time_raw=True)
-        )
-    )
-
-
