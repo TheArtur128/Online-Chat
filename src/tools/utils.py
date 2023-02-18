@@ -16,7 +16,7 @@ def length_validator_by_column(column: str, model: db.Model) -> Length:
 
 
 def ascii_range_as(range_: range) -> Generator[str, None, None]:
-    return chr(symbol_index) for symbol_index in range_
+    return (chr(symbol_index) for symbol_index in range_)
 
 
 def get_time_after(minutes: int, is_time_raw: bool = False) -> datetime | float:
