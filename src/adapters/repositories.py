@@ -77,3 +77,47 @@ class SQLAlchemyRepository(MonolithicRepository):
                 ))
 
         return sqlalchemy_conditions
+
+
+
+OriginalT = TypeVar("OriginalT")
+ConvertedT = TypeVar("OriginalT")
+
+
+class ConvertingRepository(Generic[OriginalT, ConvertedT], IRepository):
+    def __init__(
+        self,
+        repository: IRepository[OriginalT],
+        converter: Callable[[OriginalT], ConvertedT],
+        isoconverter: Callable[[ConvertedT], OriginalT]
+    ):
+        self._repository = repository
+
+        self._converter = converter
+        self._isoconverter = isoconverter
+
+    def __iter__(self) -> Iterator[ConvertedT]:
+        return iter(self.all())
+
+    def all(self) -> Iterable[ConvertedT]:
+        return tuple(map(self._converter, self._repository.all()))
+
+    def add(self, instance: ConvertedT) -> None:
+        self._repository.add(self._isoconverter(instance))
+
+    def remove(self, instance: ConvertedT) -> None:
+        self._repository.remove(self._isoconverter(instance))
+
+    def get_by(
+        self,
+        conditions: dict[str, Special[SearchAnnotation]] = dict(),
+        *,
+        is_many: bool = False,
+        **keyword_conditions: Special[SearchAnnotation]
+    ) -> Optional[many_or_one[ConvertedT]]:
+        found_object_resource = self._repository(conditions, is_many=is_many, **keyword_conditions)
+
+        if found_object_resource is None:
+            return None
+
+        return tuple(map(self._converter, as_collection(found_object_resource)))
