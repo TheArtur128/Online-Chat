@@ -6,6 +6,7 @@ from middlewares import require_access_token, redirect_on_status_code_that
 MIDDLEWARE_ENVIRONMENTS = {
     'api': {
         "USE_FOR_BLUEPRINT": True,
+        "VIEW_NAMES": BinarySet(non_included="api.userresource"),
         "MIDDLEWARES": [require_access_token]
     },
     "redirecting": {
