@@ -1,7 +1,9 @@
 from abc import ABC
-from functools import cached_property, partial
+from functools import cached_property
+from types import MappingProxyType
+from typing import TypeVar, runtime_checkable, Protocol, Generic, Iterable, Self, Tuple
 
-from pyhandling import DelegatingProperty, execute_operation
+from pyhandling import open_collection_items, DelegatingProperty
 
 from tools.formatters import format_dict
 

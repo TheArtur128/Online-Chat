@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from functools import partial
-from typing import Callable, Iterable, TypedDict
+from typing import Callable, Iterable, TypedDict, Any
 
 from marshmallow import Schema
 from pyhandling import then, on_condition, raise_, ArgumentPack

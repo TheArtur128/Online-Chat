@@ -1,4 +1,4 @@
-from flask import request
+from flask import redirect, request
 from pyhandling import *
 from pyhandling.annotations import checker_of, decorator
 

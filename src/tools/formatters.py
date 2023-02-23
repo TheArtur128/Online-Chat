@@ -1,6 +1,4 @@
-from typing import Callable, Iterable
-
-from tools.errors import ReportingError
+from typing import Callable, Any
 
 
 def format_dict(
