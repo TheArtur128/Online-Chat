@@ -19,7 +19,7 @@ migrate = Migrate(app, db)
 
 middleware_config = config_from("middlewares.config")
 
-MultipleMiddlewareRegistrar.from_config(middleware_config).init_app(app)
+MultipleMiddlewareRegistrar.from_config(middleware_config, environments_only=True).init_app(app)
 
 if __name__ == "__main__":
     app.run(port='8048')
