@@ -45,8 +45,7 @@ class UserResource(DecoratedResourceMixin):
 
     post = (
         (convert_by |to| UserSchema(exclude=["password"], many=False))
-        |then>> ArgmuntPack
-        |then>> unpackly(User) # Will be expanded
+        |then>> (call_service |to| User)
         |then>> account_sculture_from
         |then>> close(register_account, closer=post_partial)(
             ConvertingRepository(SQLAlchemyRepository(db, User), account_sculture_from, material_of),
