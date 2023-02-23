@@ -45,6 +45,12 @@ def errors_from(error_storage: ErrorKepper | SingleErrorKepper | Exception) -> T
     return errors
 
 
+@runtime_checkable
+class ErrorReport(Protocol, Generic[StoredErrorT]):
+    error: StoredErrorT
+    document: MappingProxyType
+
+
 def convert_error_report_to_dict(
     report: ErrorReport,
     *,
