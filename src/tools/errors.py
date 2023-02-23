@@ -22,26 +22,15 @@ class SingleErrorKepper(Protocol, Generic[StoredErrorT]):
 class ErrorKepper(Protocol, Generic[StoredErrorT]):
     errors: Iterable[Self | SingleErrorKepper[StoredErrorT] | StoredErrorT]
 
-class ReportingError(DecoratorError):
-    document = DelegatingProperty("_document")
 
-    def __init__(self, error: Exception, document: dict):
-        super().__init__(error)
-        self._document = document
 def errors_from(error_storage: ErrorKepper | SingleErrorKepper | Exception) -> Tuple[Exception]:
     errors = (error_storage, ) if isinstance(error_storage, Exception) else tuple()
 
-    def __str__(self) -> str:
-        formatted_report = format_dict(self._document, line_between_key_and_value='=')
     if isinstance(error_storage, SingleErrorKepper):
         errors += errors_from(error_storage.error)
     if isinstance(error_storage, ErrorKepper):
         errors += open_collection_items(map(errors_from, error_storage.errors))
 
-        return (
-            super().__str__()
-            + f" with {formatted_document}" if self._document else str()
-        )
     return errors
 
 
@@ -68,3 +57,20 @@ def convert_error_report_to_dict(
     return result_dict
 
 
+class ReportingError(ToolError):
+    document = DelegatingProperty("_document")
+
+    def __init__(self, error: Exception, document: dict):
+        self.__error = error
+        self.__document = MappingProxyType(document)
+
+        super().__init__(self._error_message)
+
+    @cached_property
+    def _error_message(self) -> str:
+        formatted_report = format_dict(self.__document, line_between_key_and_value='=')
+
+        return (
+            str(self.__error)
+            + (" when {formatted_document}" if self.__document else str())
+        )
