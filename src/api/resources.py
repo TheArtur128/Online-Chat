@@ -4,6 +4,7 @@ from functools import partial
 from flask_restful import Resource
 from pyhandling import then, to, ArgmuntPack, unpackly, close, post_partial
 from pyhandling.annotations import decorator
+from sculpting import material_of
 
 from adapters.repositories import SQLAlchemyRepository
 from infrastructure.controllers import convert_by, search_in
@@ -48,8 +49,8 @@ class UserResource(DecoratedResourceMixin):
         |then>> unpackly(User) # Will be expanded
         |then>> account_sculture_from
         |then>> close(register_account, closer=post_partial)(
-            ConvertingRepository(SQLAlchemyRepository(db, User), account_sculture_from, original_from),
-            ConvertingRepository(SQLAlchemyRepository(db, User), profile_sculture_from, original_from),
+            ConvertingRepository(SQLAlchemyRepository(db, User), account_sculture_from, material_of),
+            ConvertingRepository(SQLAlchemyRepository(db, User), profile_sculture_from, material_of),
             is_session_timed_out
         )
     )
