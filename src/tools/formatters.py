@@ -1,6 +1,4 @@
-from typing import Callable, Iterable
-
-from tools.errors import ReportingError
+from typing import Callable, Any
 
 
 def format_dict(
@@ -8,8 +6,8 @@ def format_dict(
     *,
     line_between_elements: str = ', ',
     line_between_key_and_value: str = ': ',
-    key_changer: Callable[[str], any] = lambda key: key,
-    value_changer: Callable[[any], any] = lambda value: value,
+    key_changer: Callable[[str], Any] = lambda key: key,
+    value_changer: Callable[[Any], Any] = lambda value: value,
 ) -> str:
     return line_between_elements.join(
         "{key_part}{line_between_key_and_value_part}{value_part}".format(
@@ -21,12 +19,9 @@ def format_dict(
     )
 
 
-def wrap_in_brackets(data: any, bracket: str, times: int = 1) -> str:
-    for _ in range(times):
-        data = (
-            (bracket[0] if len(bracket) > 1 else bracket)
-            + str(data)
-            + (bracket[1] if len(bracket) > 1 else bracket)
-        )
-
-    return data
+def wrap_in_brackets(data: Any, bracket: str) -> str:
+    return (
+        (bracket[0] if len(bracket) > 1 else bracket)
+        + str(data)
+        + (bracket[1] if len(bracket) > 1 else bracket)
+    )

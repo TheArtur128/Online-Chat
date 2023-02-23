@@ -1,10 +1,12 @@
-from typing import Iterable, Optional, Callable
+from typing import Iterable, Optional, Callable, TypeVar, Generic, Iterator
 
 from flask_sqlalchemy import SQLAlchemy
+from pyannotating import Special, many_or_one
+from pyhandling import as_collection
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 from sqlalchemy.sql.expression import BinaryExpression, and_, or_, not_
 
-from services.repositories import Repository
+from services.repositories import MonolithicRepository, IRepository
 from services.repositories.search_annotations import *
 from orm import db
 
@@ -84,7 +86,7 @@ OriginalT = TypeVar("OriginalT")
 ConvertedT = TypeVar("OriginalT")
 
 
-class ConvertingRepository(Generic[OriginalT, ConvertedT], IRepository):
+class ConvertingRepository(IRepository, Generic[OriginalT, ConvertedT]):
     def __init__(
         self,
         repository: IRepository[OriginalT],

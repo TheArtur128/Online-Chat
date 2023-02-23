@@ -1,12 +1,26 @@
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Generator, Iterable, Callable, Tuple
+from typing import runtime_checkable, Protocol, Generator, Iterable, Callable, Tuple
 
 from marshmallow.validate import Length
-from pyhandling import close, then, callmethod
+from pyannotating import Special
+from pyhandling import on_condition, close, then, callmethod, mergely, take, return_, previous_action_decorator_of, next_action_decorator_of, getitem_of, by, documenting_by
+from pyhandling.annotations import handler, reformer_of
 
 from orm import db
-from tools.errors import StatusCodeError
+
+
+@runtime_checkable
+class StatusCodeKeeper(Protocol):
+    status_code: int
+
+
+def status_code_parsing_with_default(default_status_code: int) -> Callable[Special[StatusCodeKeeper], int]:
+    return on_condition(
+        isinstance |by| StatusCodeKeeper,
+        getattr |by| "status_code",
+        else_=take(default_status_code)
+    )
 
 
 def length_validator_by_column(column: str, model: db.Model) -> Length:
@@ -21,14 +35,6 @@ def get_time_after(minutes: int, is_time_raw: bool = False) -> datetime | float:
     timestamp = datetime.today().timestamp() + minutes*60
 
     return timestamp if is_time_raw else datetime.fromtimestamp(timestamp)
-
-
-def get_status_code_from_error(error: Exception, *, default_error_code: int = 500) -> int:
-    return (
-        error.status_code
-        if isinstance(error, StatusCodeError)
-        else default_error_code
-    )
 
 
 def is_iterable_but_not_dict(data: any) -> bool:

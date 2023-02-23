@@ -1,3 +1,5 @@
+from functools import partial
+
 from marshmallow import Schema, fields, EXCLUDE, post_dump
 
 from orm.models import User

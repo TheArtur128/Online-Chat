@@ -1,7 +1,9 @@
 from abc import ABC
-from functools import cached_property, partial
+from functools import cached_property
+from types import MappingProxyType
+from typing import TypeVar, runtime_checkable, Protocol, Generic, Iterable, Self, Tuple
 
-from pyhandling import DelegatingProperty, execute_operation
+from pyhandling import open_collection_items, DelegatingProperty
 
 from tools.formatters import format_dict
 
@@ -10,38 +12,34 @@ class ToolError(Exception):
     pass
 
 
-class DecoratorError(ToolError):
-    error = DelegatingProperty("_error")
-
-    def __init__(self, error: Exception):
-        self._error = error
-
-    @cached_property
-    def all_errors(self) -> tuple[Exception]:
-        return partial(execute_operation, (self, ), '+')(
-            self._error.deep_errors
-            if isinstance(self._error, DecoratorError)
-            else (self._error, )
-        )
-
-    def __str__(self) -> str:
-        return f"{type(self).__name__} as {type(self._error).__name__}"
+StoredErrorT = TypeVar("StoredErrorT", bound=Exception)
 
 
-class ReportingError(DecoratorError):
-    document = DelegatingProperty("_document")
+@runtime_checkable
+class SingleErrorKepper(Protocol, Generic[StoredErrorT]):
+    error: StoredErrorT
 
-    def __init__(self, error: Exception, document: dict):
-        super().__init__(error)
-        self._document = document
 
-    def __str__(self) -> str:
-        formatted_report = format_dict(self._document, line_between_key_and_value='=')
+@runtime_checkable
+class ErrorKepper(Protocol, Generic[StoredErrorT]):
+    errors: Iterable[Self | SingleErrorKepper[StoredErrorT] | StoredErrorT]
 
-        return (
-            super().__str__()
-            + f" with {formatted_document}" if self._document else str()
-        )
+
+def errors_from(error_storage: ErrorKepper | SingleErrorKepper | Exception) -> Tuple[Exception]:
+    errors = (error_storage, ) if isinstance(error_storage, Exception) else tuple()
+
+    if isinstance(error_storage, SingleErrorKepper):
+        errors += errors_from(error_storage.error)
+    if isinstance(error_storage, ErrorKepper):
+        errors += open_collection_items(map(errors_from, error_storage.errors))
+
+    return errors
+
+
+@runtime_checkable
+class ErrorReport(Protocol, Generic[StoredErrorT]):
+    error: StoredErrorT
+    document: MappingProxyType
 
 
 def convert_error_report_to_dict(
@@ -61,5 +59,20 @@ def convert_error_report_to_dict(
     return result_dict
 
 
-class InputDataCorrectionError(ReportingError):
-    pass
+class ReportingError(ToolError):
+    document = DelegatingProperty("_document")
+
+    def __init__(self, error: Exception, document: dict):
+        self.__error = error
+        self.__document = MappingProxyType(document)
+
+        super().__init__(self._error_message)
+
+    @cached_property
+    def _error_message(self) -> str:
+        formatted_report = format_dict(self.__document, line_between_key_and_value='=')
+
+        return (
+            str(self.__error)
+            + (" when {formatted_document}" if self.__document else str())
+        )

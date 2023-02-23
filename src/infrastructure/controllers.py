@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from functools import partial
-from typing import Callable, Iterable, TypedDict
+from typing import Callable, Iterable, TypedDict, Any
 
 from marshmallow import Schema
 from pyhandling import then, on_condition, raise_, ArgumentPack
@@ -16,7 +16,7 @@ class SearchResult(TypedDict):
     lost: Iterable = tuple()
 
 
-def convert_by(schema: Schema, chunk: Iterable) -> reformer_of[Iterable]:
+def convert_by(schema: Schema, chunk: Iterable) -> Iterable:
     return chunk >= (
         returnly(
             schema.validate

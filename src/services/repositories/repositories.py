@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
-from typing import Optional, Iterable, Union, Callable, Generic, TypeVar
+from typing import Optional, Iterable, Union, Callable, Generic, Iterator, TypeVar
+
+from pyannotating import Special, many_or_one
 
 from services.repositories.search_annotations import *
 

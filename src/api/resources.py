@@ -1,17 +1,19 @@
 from abc import ABC
 from functools import partial
 
+from flask import request
 from flask_restful import Resource
-from pyhandling import then, to, ArgmuntPack, unpackly, close, post_partial
+from pyhandling import to, then, call, close, post_partial
 from pyhandling.annotations import decorator
+from sculpting import material_of
 
-from adapters.repositories import SQLAlchemyRepository
-from infrastructure.controllers import convert_by, search_in
-from maps.schemes import UserSchema, user_schema_without_passwords
-from maps.scultures import account_sculture_from, original_from, profile_sculture_from
+from api.schemes import UserSchema, user_schema_without_passwords
+from adapters.repositories import ConvertingRepository, SQLAlchemyRepository
+from adapters.sculptures import account_sculture_from, profile_sculture_from
+from infrastructure.controllers import convert_by, search_in, call_service
+from rules.authorization import register_account, is_session_timed_out
 from orm import db
 from orm.models import User
-from services.authorization import register_account, is_session_timed_out
 from tools.utils import data_additing_decorator_by, dict_value_map
 
 
@@ -32,7 +34,9 @@ class DecoratedResourceMixin(Resource, ABC):
 
 
 class UserResource(DecoratedResourceMixin):
-    _decorator = data_additing_decorator_by(request.json)
+    _decorator = data_additing_decorator_by(
+        (getattr |to* (request, 'json')) |then>> call
+    )
 
     get = (
         (convert_by |to| user_schema_without_passwords(many=True))
@@ -42,12 +46,11 @@ class UserResource(DecoratedResourceMixin):
 
     post = (
         (convert_by |to| UserSchema(exclude=["password"], many=False))
-        |then>> ArgmuntPack
-        |then>> unpackly(User) # Will be expanded
+        |then>> (call_service |to| User)
         |then>> account_sculture_from
         |then>> close(register_account, closer=post_partial)(
-            ConvertingRepository(SQLAlchemyRepository(db, User), account_sculture_from, original_from),
-            ConvertingRepository(SQLAlchemyRepository(db, User), profile_sculture_from, original_from),
+            ConvertingRepository(SQLAlchemyRepository(db, User), account_sculture_from, material_of),
+            ConvertingRepository(SQLAlchemyRepository(db, User), profile_sculture_from, material_of),
             is_session_timed_out
         )
     )

@@ -1,1 +1,1 @@
-__init__.py
+from services.repositories.repositories import *

@@ -1,5 +1,7 @@
 from datetime import datetime
-from typing import Protocol, runtime_checkable
+from typing import Protocol
+
+from pyhandling.annotations import checker_of
 
 from services.errors import RegistrationError
 from services.repositories import IRepository
@@ -7,7 +9,6 @@ from services.tokens import token_coder
 from tools.utils import get_time_after
 
 
-@runtime_checkable
 class Session(Protocol):
     cancellation_time: datetime
 
@@ -16,7 +17,6 @@ def is_session_timed_out(session: Session) -> bool:
     return datetime.now() < session.cancellation_time
 
 
-@runtime_checkable
 class Profile(Protocol):
     full_name: str
     short_name: str
@@ -31,7 +31,6 @@ def token_for(profile: Profile, coder: token_coder, life_minutes: int | float) -
     )
 
 
-@runtime_checkable
 class Account(Protocol):
     profile: Profile
     session: Session
