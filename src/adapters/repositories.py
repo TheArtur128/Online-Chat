@@ -84,7 +84,7 @@ OriginalT = TypeVar("OriginalT")
 ConvertedT = TypeVar("OriginalT")
 
 
-class ConvertingRepository(Generic[OriginalT, ConvertedT], IRepository):
+class ConvertingRepository(IRepository, Generic[OriginalT, ConvertedT]):
     def __init__(
         self,
         repository: IRepository[OriginalT],
