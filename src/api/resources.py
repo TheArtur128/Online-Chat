@@ -32,7 +32,9 @@ class DecoratedResourceMixin(Resource, ABC):
 
 
 class UserResource(DecoratedResourceMixin):
-    _decorator = data_additing_decorator_by(request.json)
+    _decorator = data_additing_decorator_by(
+        (getattr |to* (request, 'json')) |then>> call
+    )
 
     get = (
         (convert_by |to| user_schema_without_passwords(many=True))
