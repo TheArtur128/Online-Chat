@@ -3,6 +3,7 @@ from pyhandling import *
 from pyhandling.annotations import checker_of, decorator
 
 from adapters.tokens import JWTSerializator
+from config import SECRET_KEY
 from services.tokens import validate_access_token
 from tools.utils import event_decorator
 
@@ -20,5 +21,5 @@ def redirect_on_status_code_that(status_code_checker: checker_of[int], url_to_re
 require_access_token: decorator = merge_events |by| (
     event_as(getattr, request, "headers")
     |then>> (callmethod |by| 'get')
-    |then>> (validate_access_token |by| JWTSerializator())
+    |then>> (validate_access_token |by| JWTSerializator(SECRET_KEY))
 )
