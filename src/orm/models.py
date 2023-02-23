@@ -7,7 +7,7 @@ class UserSession(db.Model):
     __tablename__ ="user_sessions"
 
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey(UserSession.id), unique=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), unique=True)
     token = db.Column(db.String(512), nullable=False)
     cancellation_time = db.Column(db.DateTime, nullable=False)
 
