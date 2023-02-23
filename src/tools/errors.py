@@ -61,5 +61,3 @@ def convert_error_report_to_dict(
     return result_dict
 
 
-class InputDataCorrectionError(ReportingError):
-    pass
