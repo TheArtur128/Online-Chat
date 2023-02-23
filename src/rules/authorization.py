@@ -1,5 +1,7 @@
 from datetime import datetime
-from typing import Protocol, runtime_checkable
+from typing import Protocol
+
+from pyhandling.annotations import checker_of
 
 from services.errors import RegistrationError
 from services.repositories import IRepository
