@@ -10,23 +10,17 @@ class ToolError(Exception):
     pass
 
 
-class DecoratorError(ToolError):
-    error = DelegatingProperty("_error")
+StoredErrorT = TypeVar("StoredErrorT", bound=Exception)
 
-    def __init__(self, error: Exception):
-        self._error = error
 
-    @cached_property
-    def all_errors(self) -> tuple[Exception]:
-        return partial(execute_operation, (self, ), '+')(
-            self._error.deep_errors
-            if isinstance(self._error, DecoratorError)
-            else (self._error, )
-        )
+@runtime_checkable
+class SingleErrorKepper(Protocol, Generic[StoredErrorT]):
+    error: StoredErrorT
 
-    def __str__(self) -> str:
-        return f"{type(self).__name__} as {type(self._error).__name__}"
 
+@runtime_checkable
+class ErrorKepper(Protocol, Generic[StoredErrorT]):
+    errors: Iterable[Self | SingleErrorKepper[StoredErrorT] | StoredErrorT]
 
 class ReportingError(DecoratorError):
     document = DelegatingProperty("_document")
@@ -34,14 +28,21 @@ class ReportingError(DecoratorError):
     def __init__(self, error: Exception, document: dict):
         super().__init__(error)
         self._document = document
+def errors_from(error_storage: ErrorKepper | SingleErrorKepper | Exception) -> Tuple[Exception]:
+    errors = (error_storage, ) if isinstance(error_storage, Exception) else tuple()
 
     def __str__(self) -> str:
         formatted_report = format_dict(self._document, line_between_key_and_value='=')
+    if isinstance(error_storage, SingleErrorKepper):
+        errors += errors_from(error_storage.error)
+    if isinstance(error_storage, ErrorKepper):
+        errors += open_collection_items(map(errors_from, error_storage.errors))
 
         return (
             super().__str__()
             + f" with {formatted_document}" if self._document else str()
         )
+    return errors
 
 
 def convert_error_report_to_dict(
